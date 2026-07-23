@@ -7,6 +7,9 @@ import { useLogin, useSignup, useMagicLink } from '@/hooks/useAuth';
 import { showToast } from '@/components/common/Toast';
 import { GeometricPattern } from '@/components/common/GeometricPattern';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const FRONTEND_URL = window.location.origin;
+
 export function Auth() {
   const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
@@ -42,6 +45,26 @@ export function Auth() {
     });
   };
 
+  const handleGoogleLogin = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      `${API_URL.replace('/api/v1', '')}/auth/google`,
+      'google-oauth',
+      `width=${width},height=${height},left=${left},top=${top}`,
+    );
+
+    const interval = setInterval(() => {
+      if (!popup || popup.closed) {
+        clearInterval(interval);
+        window.location.reload();
+      }
+    }, 500);
+  };
+
   return (
     <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', position: 'relative' }}>
       <GeometricPattern subtle />
@@ -58,7 +81,7 @@ export function Auth() {
             <Button type="submit" style={{ width: '100%' }} disabled={login.isPending || signup.isPending}>{isSignUp ? 'Sign Up' : 'Log In'}</Button>
             <div className="divider" />
             <Button variant="secondary" style={{ width: '100%' }} onClick={() => setShowMagicLink(true)}><Mail size={16} /> Send Magic Link</Button>
-            <Button variant="ghost" style={{ width: '100%' }} onClick={() => navigate('/today')}>Continue with Google</Button>
+            <Button variant="ghost" style={{ width: '100%' }} onClick={handleGoogleLogin}>Continue with Google</Button>
             <p className="body-sm text-secondary" style={{ textAlign: 'center' }}>
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button type="button" style={{ color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'var(--weight-medium)' }} onClick={() => setIsSignUp(!isSignUp)}>{isSignUp ? 'Log In' : 'Sign Up'}</button>

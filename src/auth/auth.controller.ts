@@ -10,20 +10,19 @@ import {
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
+import { TokenService } from './token.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { MagicLinkDto } from './dto/magic-link.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { PrismaService } from '../prisma/prisma.service';
-import { CryptoUtil } from '../common/utils/crypto.util';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly prisma: PrismaService,
+    private readonly tokenService: TokenService,
   ) {}
 
   @Post('signup')
@@ -35,8 +34,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const result = await this.authService.login(loginDto);
-    const refreshToken = await this.issueRefreshToken(loginDto.email);
-    this.setTokens(res, result.accessToken, refreshToken);
+    const tokens = await this.tokenService.issueTokens(
+      result.user.id,
+      result.user.email,
+    );
+    this.setTokens(res, result.accessToken, tokens.refreshToken);
     return res.json(result);
   }
 
@@ -71,8 +73,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async verifyMagicLink(@Body('token') token: string, @Res() res: Response) {
     const result = await this.authService.verifyMagicLink(token);
-    const refreshToken = await this.issueRefreshToken(result.user.email);
-    this.setTokens(res, result.accessToken, refreshToken);
+    const tokens = await this.tokenService.issueTokens(
+      result.user.id,
+      result.user.email,
+    );
+    this.setTokens(res, result.accessToken, tokens.refreshToken);
     return res.json(result);
   }
 
@@ -84,8 +89,11 @@ export class AuthController {
   @Post('apple')
   async appleLogin(@Body('identityToken') identityToken: string, @Res() res: Response) {
     const result = await this.authService.appleLogin(identityToken);
-    const refreshToken = await this.issueRefreshToken(result.user.email);
-    this.setTokens(res, result.accessToken, refreshToken);
+    const tokens = await this.tokenService.issueTokens(
+      result.user.id,
+      result.user.email,
+    );
+    this.setTokens(res, result.accessToken, tokens.refreshToken);
     return res.json(result);
   }
 
@@ -114,12 +122,6 @@ export class AuthController {
   async revokeAll(@Req() req: Request) {
     const user = req.user as { sub: string };
     return await this.authService.revokeAllSessions(user.sub);
-  }
-
-  private async issueRefreshToken(email: string): Promise<string> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) return '';
-    return CryptoUtil.generateSecureToken(32);
   }
 
   private setTokens(res: Response, accessToken: string, refreshToken: string) {

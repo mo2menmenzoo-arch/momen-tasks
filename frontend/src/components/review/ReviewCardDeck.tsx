@@ -18,7 +18,7 @@ export function ReviewCardDeck() {
     <StatsCard key="stats" data={weeklyReview} />,
     <RadarChartComponent key="radar" metric={metrics} />,
     <ClarityTrend key="trend" data={history} />,
-    <AiSuggestions key="ai" suggestions={[]} />,
+    <AiSuggestions key="ai" suggestions={weeklyReview?.suggestions || []} />,
     <ReflectionJournal key="journal" />,
   ];
 

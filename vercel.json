@@ -1,9 +1,15 @@
 {
   "version": 2,
+  "buildCommand": "npm run vercel:build",
+  "installCommand": "npm install && cd frontend && npm install",
+  "outputDirectory": "frontend/dist",
   "builds": [
     {
       "src": "api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["src/**", "node_modules/**"]
+      }
     },
     {
       "src": "frontend/dist/**",
@@ -23,5 +29,7 @@
       "dest": "/frontend/dist/index.html"
     }
   ],
-  "outputDirectory": "frontend/dist"
+  "env": {
+    "PRISMA_CLI_QUERY_ENGINE_TYPE": "library"
+  }
 }

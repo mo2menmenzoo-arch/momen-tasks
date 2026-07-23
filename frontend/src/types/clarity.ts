@@ -25,4 +25,5 @@ export interface WeeklyReview {
   createdTasks: number;
   averageClarityScore: number;
   metrics: ClarityMetricHistory[];
+  suggestions: string[];
 }

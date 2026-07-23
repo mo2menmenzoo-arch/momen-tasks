@@ -11,6 +11,7 @@ datasource db {
 model User {
   id                String             @id @default(uuid())
   email             String             @unique @db.Citext
+  passwordHash      String?            @map("password_hash")
   emailVerified     Boolean            @default(false)
   authProvider      AuthProvider
   displayName       String?
@@ -35,6 +36,8 @@ model User {
   refreshTokens     RefreshToken[]
   pushSubscriptions PushSubscription[]
   assignedTasks     Task[]           @relation("TaskAssignment")
+
+  @@map("User")
 }
 
 enum AuthProvider {
@@ -56,11 +59,11 @@ enum SubscriptionTier {
 
 model Zone {
   id          String    @id @default(uuid())
-  ownerId     String
+  ownerId     String    @map("owner_id")
   name        String
   icon        String?
   color       String?
-  isShared    Boolean   @default(false)
+  isShared    Boolean   @default(false) @map("is_shared")
   sortOrder   Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -72,12 +75,13 @@ model Zone {
 
   @@index([ownerId])
   @@index([isShared])
+  @@map("Zone")
 }
 
 model ZoneMember {
   id        String   @id @default(uuid())
-  zoneId    String
-  userId    String
+  zoneId    String   @map("zone_id")
+  userId    String   @map("user_id")
   role      ZoneRole
   joinedAt  DateTime @default(now())
 
@@ -86,6 +90,7 @@ model ZoneMember {
 
   @@unique([zoneId, userId])
   @@index([userId])
+  @@map("ZoneMember")
 }
 
 enum ZoneRole {
@@ -96,9 +101,9 @@ enum ZoneRole {
 
 model Task {
   id                  String       @id @default(uuid())
-  ownerId             String
-  zoneId              String?
-  parentTaskId        String?
+  ownerId             String       @map("owner_id")
+  zoneId              String?      @map("zone_id")
+  parentTaskId        String?      @map("parent_task_id")
   title               String
   notes               String?
   priority            TaskPriority @default(MEDIUM)
@@ -136,6 +141,7 @@ model Task {
   @@index([priority])
   @@index([blockedBy])
   @@index([blocks])
+  @@map("Task")
 }
 
 enum TaskPriority {
@@ -162,8 +168,8 @@ enum TaskSource {
 
 model FocusSession {
   id              String   @id @default(uuid())
-  taskId          String
-  userId          String
+  taskId          String   @map("task_id")
+  userId          String   @map("user_id")
   durationSeconds Int
   ambientSound    String?
   startedAt       DateTime
@@ -176,11 +182,12 @@ model FocusSession {
   @@index([userId])
   @@index([taskId])
   @@index([startedAt])
+  @@map("FocusSession")
 }
 
 model ClarityMetric {
   id              String   @id @default(uuid())
-  userId          String
+  userId          String   @map("user_id")
   date            DateTime @default(now()) @db.Date
   tasksCompleted  Int      @default(0)
   tasksCreated    Int      @default(0)
@@ -194,16 +201,17 @@ model ClarityMetric {
   @@unique([userId, date])
   @@index([userId])
   @@index([date])
+  @@map("ClarityMetric")
 }
 
 model Template {
   id            String   @id @default(uuid())
-  authorId      String?
+  authorId      String?  @map("author_id")
   title         String
   description   String?
   taskBlueprint Json
-  isPublic      Boolean  @default(false)
-  isModerated   Boolean  @default(false)
+  isPublic      Boolean  @default(false) @map("is_public")
+  isModerated   Boolean  @default(false) @map("is_moderated")
   usageCount    Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -212,12 +220,13 @@ model Template {
 
   @@index([isPublic])
   @@index([authorId])
+  @@map("Template")
 }
 
 model Notification {
   id          String           @id @default(uuid())
-  userId      String
-  taskId      String?
+  userId      String           @map("user_id")
+  taskId      String?          @map("task_id")
   type        NotificationType
   scheduledAt DateTime
   sentAt      DateTime?
@@ -231,6 +240,7 @@ model Notification {
   @@index([userId])
   @@index([scheduledAt])
   @@index([status])
+  @@map("Notification")
 }
 
 enum NotificationType {
@@ -249,7 +259,7 @@ enum NotificationStatus {
 
 model RefreshToken {
   id          String   @id @default(uuid())
-  userId      String
+  userId      String   @map("user_id")
   tokenHash   String   @unique
   familyId    String
   issuedAt    DateTime @default(now())
@@ -262,14 +272,15 @@ model RefreshToken {
   @@index([userId])
   @@index([familyId])
   @@index([expiresAt])
+  @@map("RefreshToken")
 }
 
 model AuditLog {
   id          String   @id @default(uuid())
-  actorId     String
+  actorId     String   @map("actor_id")
   action      String
-  targetType  String
-  targetId    String
+  targetType  String   @map("target_type")
+  targetId    String   @map("target_id")
   metadata    Json?
   createdAt   DateTime @default(now())
 
@@ -278,11 +289,12 @@ model AuditLog {
   @@index([actorId])
   @@index([targetType, targetId])
   @@index([createdAt])
+  @@map("AuditLog")
 }
 
 model PushSubscription {
   id          String   @id @default(uuid())
-  userId      String
+  userId      String   @map("user_id")
   endpoint    String   @unique
   keys        Json
   userAgent   String?
@@ -292,4 +304,5 @@ model PushSubscription {
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
+  @@map("PushSubscription")
 }

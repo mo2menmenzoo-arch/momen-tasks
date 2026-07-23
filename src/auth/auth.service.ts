@@ -37,6 +37,7 @@ export class AuthService {
     await this.prisma.user.create({
       data: {
         email: signupDto.email,
+        passwordHash: hashedPassword,
         displayName: signupDto.displayName || signupDto.email.split('@')[0],
         authProvider: 'EMAIL',
         emailVerified: false,
@@ -56,6 +57,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      select: { id: true, email: true, authProvider: true, emailVerified: true, passwordHash: true },
     });
 
     if (!user) {
@@ -68,7 +70,11 @@ export class AuthService {
       );
     }
 
-    const isValid = await this.passwordService.verify(password, '');
+    if (!user.passwordHash) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isValid = await this.passwordService.verify(password, user.passwordHash);
 
     if (!isValid) {
       throw new UnauthorizedException('Invalid credentials');
@@ -246,7 +252,7 @@ export class AuthService {
 
     await this.prisma.user.update({
       where: { email },
-      data: { emailVerified: true },
+      data: { passwordHash: hashedPassword },
     });
 
     await this.prisma.$executeRaw`
@@ -322,20 +328,48 @@ export class AuthService {
     email: string;
     name?: string;
   }> {
-    const { OAuth2Client } = require('google-auth-library');
-    const client = new OAuth2Client();
+    const jwt = require('jsonwebtoken');
+    const axios = require('axios');
 
     try {
-      const ticket = await client.verifyIdToken({
-        idToken: identityToken,
+      // Decode header to get kid
+      const headerB64 = identityToken.split('.')[0];
+      const header = JSON.parse(Buffer.from(headerB64, 'base64url').toString());
+
+      // Fetch Apple's public keys
+      const { data: appleKeys } = await axios.get('https://appleid.apple.com/auth/keys');
+
+      // Find the matching key
+      const matchingKey = appleKeys.keys.find((key: any) => key.kid === header.kid);
+      if (!matchingKey) {
+        throw new UnauthorizedException('Invalid Apple token: no matching key');
+      }
+
+      // Construct the public key
+      const publicKey = require('crypto').createPublicKey({
+        key: {
+          kty: matchingKey.kty,
+          alg: matchingKey.alg,
+          use: 'sig',
+          n: matchingKey.n,
+          e: matchingKey.e,
+        },
+        format: 'jwk',
+      });
+
+      // Verify the token
+      const payload: any = jwt.verify(identityToken, publicKey, {
+        algorithms: ['RS256'],
+        issuer: 'https://appleid.apple.com',
         audience: this.configService.get<string>('APPLE_CLIENT_ID'),
       });
-      const payload = ticket.getPayload();
+
       return {
         email: payload.email,
         name: payload.name,
       };
-    } catch {
+    } catch (error: any) {
+      if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException('Invalid Apple identity token');
     }
   }

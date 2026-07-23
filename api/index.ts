@@ -8,6 +8,9 @@ import express from 'express';
 import { AppModule } from '../src/app.module';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
 import { PrismaExceptionFilter } from '../src/common/filters/prisma-exception.filter';
+import { LoggingInterceptor } from '../src/common/interceptors/logging.interceptor';
+import { TransformInterceptor } from '../src/common/interceptors/transform.interceptor';
+import { TimeoutInterceptor } from '../src/common/interceptors/timeout.interceptor';
 
 let cachedServer: any;
 
@@ -38,6 +41,11 @@ async function createServer() {
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter(), new PrismaExceptionFilter());
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TransformInterceptor(),
+    new TimeoutInterceptor(),
+  );
 
   await app.init();
   return expressApp;

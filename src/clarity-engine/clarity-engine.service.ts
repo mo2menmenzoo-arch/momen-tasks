@@ -191,6 +191,50 @@ export class ClarityEngineService {
         metrics.length
       : 0;
 
+    // Generate suggestions based on metrics
+    const suggestions: string[] = [];
+
+    if (completedTasks === 0) {
+      suggestions.push('Try completing at least one task today to build momentum');
+    } else if (completedTasks < 3) {
+      suggestions.push('Great start! Try to complete one more task to boost your clarity score');
+    }
+
+    const overdueCount = await this.prisma.task.count({
+      where: {
+        ownerId: userId,
+        status: 'PENDING',
+        dueDate: { lt: new Date() },
+      },
+    });
+
+    if (overdueCount > 0) {
+      suggestions.push(`You have ${overdueCount} overdue task${overdueCount > 1 ? 's' : ''} - consider rescheduling or completing them`);
+    }
+
+    // Check zone balance
+    const zoneDistribution: Record<string, number> = {};
+    for (const m of metrics) {
+      if (m.zoneDistribution && typeof m.zoneDistribution === 'object') {
+        for (const [zoneId, data] of Object.entries(m.zoneDistribution as Record<string, any>)) {
+          zoneDistribution[zoneId] = (zoneDistribution[zoneId] || 0) + (data.count || 0);
+        }
+      }
+    }
+
+    const zones = Object.keys(zoneDistribution);
+    if (zones.length > 0) {
+      const maxZone = zones.reduce((a, b) => (zoneDistribution[a] > zoneDistribution[b] ? a : b));
+      const minZone = zones.reduce((a, b) => (zoneDistribution[a] < zoneDistribution[b] ? a : b));
+      if (zoneDistribution[maxZone] > zoneDistribution[minZone] * 3) {
+        suggestions.push('Your focus is heavily concentrated - try balancing across more life zones');
+      }
+    }
+
+    if (suggestions.length === 0) {
+      suggestions.push('Keep up the great work! Your clarity score is on track');
+    }
+
     return {
       weekStart: startOfWeek,
       weekEnd: endOfWeek,
@@ -198,6 +242,7 @@ export class ClarityEngineService {
       createdTasks,
       averageClarityScore: Math.round(avgScore),
       metrics,
+      suggestions,
     };
   }
 }
