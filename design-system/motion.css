@@ -1,0 +1,185 @@
+/* ============================================================
+   MOMEN TASKS — Motion System
+   ============================================================ */
+
+/* ── Respect Reduced Motion ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Transitions ─────────────────────────────────────────── */
+.transition-colors {
+  transition: color var(--duration-normal) var(--ease-default),
+              background-color var(--duration-normal) var(--ease-default),
+              border-color var(--duration-normal) var(--ease-default);
+}
+
+.transition-transform {
+  transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.transition-all {
+  transition: all var(--duration-normal) var(--ease-default);
+}
+
+.transition-spring {
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+/* ── Task Completion Checkmark ───────────────────────────── */
+@keyframes checkmark-draw {
+  0%   { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes checkmark-scale {
+  0%   { transform: scale(0.8); opacity: 0; }
+  50%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.checkmark-animate {
+  animation: checkmark-scale var(--duration-normal) var(--ease-spring) forwards;
+}
+
+.checkmark-animate path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmark-draw var(--duration-normal) var(--ease-out) forwards;
+}
+
+/* ── Fade In ─────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in      { animation: fade-in var(--duration-normal) var(--ease-out) forwards; }
+.animate-fade-in-up   { animation: fade-in-up var(--duration-normal) var(--ease-out) forwards; }
+.animate-fade-in-down { animation: fade-in-down var(--duration-normal) var(--ease-out) forwards; }
+
+/* ── Slide ───────────────────────────────────────────────── */
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.animate-slide-up       { animation: slide-up var(--duration-normal) var(--ease-out) forwards; }
+.animate-slide-down     { animation: slide-down var(--duration-normal) var(--ease-in) forwards; }
+.animate-slide-in-right { animation: slide-in-right var(--duration-normal) var(--ease-out) forwards; }
+
+/* ── Scale ───────────────────────────────────────────────── */
+@keyframes scale-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pop-in {
+  0%   { transform: scale(0.8); opacity: 0; }
+  70%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-in { animation: scale-in var(--duration-fast) var(--ease-out) forwards; }
+.animate-pop-in   { animation: pop-in var(--duration-normal) var(--ease-spring) forwards; }
+
+/* ── Pulse (for live indicators) ─────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+.animate-pulse {
+  animation: pulse 2s var(--ease-default) infinite;
+}
+
+/* ── Shimmer (loading skeleton) ──────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-elevated) 25%,
+    var(--border-subtle) 50%,
+    var(--surface-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s var(--ease-default) infinite;
+  border-radius: var(--radius-md);
+}
+
+/* ── Radial Menu ─────────────────────────────────────────── */
+@keyframes radial-expand {
+  from { transform: scale(0) rotate(-30deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.animate-radial-expand {
+  animation: radial-expand var(--duration-normal) var(--ease-spring) forwards;
+  transform-origin: center center;
+}
+
+/* ── Stagger Children ────────────────────────────────────── */
+.stagger-children > * {
+  opacity: 0;
+  animation: fade-in-up var(--duration-normal) var(--ease-out) forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+
+/* ── Ghost Preview (drag) ────────────────────────────────── */
+.ghost-preview {
+  opacity: 0.6;
+  border: 2px dashed var(--accent-primary);
+  background: rgba(91, 141, 239, 0.05);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-instant) var(--ease-default);
+}
+
+/* ── Swipe Action Reveal ─────────────────────────────────── */
+.swipe-action-complete {
+  background: var(--accent-success);
+  color: var(--text-inverse);
+}
+
+.swipe-action-snooze {
+  background: var(--accent-warning);
+  color: var(--text-inverse);
+}

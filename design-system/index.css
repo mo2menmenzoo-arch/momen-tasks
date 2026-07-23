@@ -1,0 +1,136 @@
+/* ============================================================
+   MOMEN TASKS — Design System
+   Techo × Geometric Calm
+   ============================================================
+   
+   A calm, structured design system for a life operating system.
+   Built for clarity, not complexity.
+   
+   Usage:
+     <link rel="stylesheet" href="design-system/index.css">
+   
+   Or import individual layers:
+     @import 'design-system/tokens.css';
+     @import 'design-system/typography.css';
+     @import 'design-system/components.css';
+     @import 'design-system/motion.css';
+     @import 'design-system/patterns.css';
+   ============================================================ */
+
+@import url('./tokens.css');
+@import url('./typography.css');
+@import url('./components.css');
+@import url('./motion.css');
+@import url('./patterns.css');
+
+/* ── Base Reset ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--surface-primary);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── Smooth theme transition ─────────────────────────────── */
+body,
+body * {
+  transition: background-color var(--duration-normal) var(--ease-default),
+              color var(--duration-normal) var(--ease-default),
+              border-color var(--duration-normal) var(--ease-default);
+}
+
+/* ── Remove default focus ring, add custom ───────────────── */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* ── Link defaults ───────────────────────────────────────── */
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ── Image defaults ──────────────────────────────────────── */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Button reset ────────────────────────────────────────── */
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ── List reset ──────────────────────────────────────────── */
+ul,
+ol {
+  list-style: none;
+}
+
+/* ── Scrollbar (desktop) ─────────────────────────────────── */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: var(--radius-full);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+  }
+}
+
+/* ── Standalone PWA detection ────────────────────────────── */
+@media (display-mode: standalone) {
+  body {
+    /* Additional standalone-specific adjustments */
+  }
+}
+
+/* ── Safe area utilities ─────────────────────────────────── */
+.safe-area-top {
+  padding-top: var(--safe-area-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}

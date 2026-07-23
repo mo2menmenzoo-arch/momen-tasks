@@ -1,0 +1,6 @@
+/* Momen Tasks — Global Styles */
+@import url('./design-system/index.css');
+
+#root {
+  min-height: 100dvh;
+}

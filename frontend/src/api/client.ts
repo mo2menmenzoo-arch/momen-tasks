@@ -1,0 +1,72 @@
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+export class ApiError extends Error {
+  constructor(public statusCode: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+export class AuthError extends Error {
+  constructor(message = 'Session expired') {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
+let refreshPromise: Promise<boolean> | null = null;
+
+async function refreshAccessToken(): Promise<boolean> {
+  try {
+    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (response.ok) {
+      await response.json();
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+    credentials: 'include',
+  });
+
+  if (response.status === 401) {
+    if (!refreshPromise) {
+      refreshPromise = refreshAccessToken();
+    }
+    const refreshed = await refreshPromise;
+    refreshPromise = null;
+    if (refreshed) {
+      return apiRequest<T>(endpoint, options);
+    }
+    throw new AuthError();
+  }
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new ApiError(response.status, error.message || 'Request failed');
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const body = await response.json();
+  return body.data;
+}
+
+export function getApiBase(): string {
+  return BASE_URL;
+}

@@ -1,0 +1,212 @@
+/* ============================================================
+   MOMEN TASKS — Design Tokens
+   Techo × Geometric Calm
+   ============================================================ */
+
+:root {
+  /* ── Primitive: Neutrals ─────────────────────────────────── */
+  --momen-black:        #0A0A0F;
+  --momen-gray-950:     #111118;
+  --momen-gray-900:     #1A1A24;
+  --momen-gray-800:     #252530;
+  --momen-gray-700:     #35354A;
+  --momen-gray-600:     #4A4A65;
+  --momen-gray-500:     #6B6B8A;
+  --momen-gray-400:     #8E8EAA;
+  --momen-gray-300:     #B0B0C8;
+  --momen-gray-200:     #D0D0E0;
+  --momen-gray-100:     #E8E8F0;
+  --momen-white:        #F5F5FA;
+
+  --momen-cream:        #FAF8F5;
+  --momen-warm-white:   #F2EDE8;
+
+  /* ── Primitive: Zone Palette ─────────────────────────────── */
+  --zone-work:          #5B8DEF;
+  --zone-health:        #4ECDC4;
+  --zone-relationships: #E87C9F;
+  --zone-growth:        #A78BFA;
+  --zone-home:          #F0A868;
+  --zone-finance:       #6BCB77;
+
+  /* ── Primitive: Priority ─────────────────────────────────── */
+  --priority-critical:  #EF4444;
+  --priority-high:      #F59E0B;
+  --priority-medium:    #5B8DEF;
+  --priority-low:       #6B6B8A;
+
+  /* ── Semantic: Surfaces ──────────────────────────────────── */
+  --surface-primary:    var(--momen-gray-950);
+  --surface-secondary:  var(--momen-gray-900);
+  --surface-elevated:   var(--momen-gray-800);
+  --surface-overlay:    rgba(10, 10, 15, 0.85);
+
+  /* ── Semantic: Text ──────────────────────────────────────── */
+  --text-primary:       var(--momen-gray-100);
+  --text-secondary:     var(--momen-gray-400);
+  --text-tertiary:      var(--momen-gray-600);
+  --text-inverse:       var(--momen-gray-950);
+
+  /* ── Semantic: Borders ───────────────────────────────────── */
+  --border-subtle:      var(--momen-gray-800);
+  --border-default:     var(--momen-gray-700);
+  --border-strong:      var(--momen-gray-600);
+
+  /* ── Semantic: Accent ────────────────────────────────────── */
+  --accent-primary:     var(--zone-work);
+  --accent-success:     var(--zone-finance);
+  --accent-warning:     var(--priority-high);
+  --accent-danger:      var(--priority-critical);
+  --accent-info:        var(--zone-growth);
+
+  /* ── Spacing (8px base) ──────────────────────────────────── */
+  --space-0:   0;
+  --space-1:   0.25rem;
+  --space-2:   0.5rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --space-10:  2.5rem;
+  --space-12:  3rem;
+  --space-16:  4rem;
+  --space-20:  5rem;
+
+  /* ── Border Radius ───────────────────────────────────────── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-xl:   0 16px 48px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(91, 141, 239, 0.15);
+
+  /* ── Typography ──────────────────────────────────────────── */
+  --font-family-body:     'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-family-display:  'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-family-mono:     'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  --text-xs:    0.75rem;
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.25rem;
+  --text-2xl:   1.5rem;
+  --text-3xl:   1.875rem;
+  --text-4xl:   2.25rem;
+
+  --leading-tight:   1.25;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+
+  /* ── Motion ──────────────────────────────────────────────── */
+  --duration-instant:  100ms;
+  --duration-fast:     200ms;
+  --duration-normal:   300ms;
+  --duration-slow:     500ms;
+
+  --ease-default:      cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:           cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:          cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-Index ─────────────────────────────────────────────── */
+  --z-base:      0;
+  --z-elevated:  10;
+  --z-sticky:    100;
+  --z-overlay:   200;
+  --z-modal:     300;
+  --z-toast:     400;
+  --z-focus:     500;
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  --tab-bar-height:    64px;
+  --header-height:     56px;
+  --capture-bar-height: 60px;
+  --safe-area-bottom:  env(safe-area-inset-bottom, 0px);
+  --safe-area-top:     env(safe-area-inset-top, 0px);
+}
+
+/* ── Light Mode ──────────────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --surface-primary:    var(--momen-cream);
+    --surface-secondary:  var(--momen-warm-white);
+    --surface-elevated:   var(--momen-white);
+    --surface-overlay:    rgba(250, 248, 245, 0.9);
+
+    --text-primary:       var(--momen-gray-950);
+    --text-secondary:     var(--momen-gray-600);
+    --text-tertiary:      var(--momen-gray-500);
+    --text-inverse:       var(--momen-white);
+
+    --border-subtle:      var(--momen-gray-200);
+    --border-default:     var(--momen-gray-300);
+    --border-strong:      var(--momen-gray-400);
+
+    --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.1);
+    --shadow-xl:   0 16px 48px rgba(0, 0, 0, 0.12);
+    --shadow-glow: 0 0 20px rgba(91, 141, 239, 0.1);
+  }
+}
+
+/* ── Manual Dark Override ────────────────────────────────── */
+[data-theme="dark"] {
+  --surface-primary:    var(--momen-gray-950);
+  --surface-secondary:  var(--momen-gray-900);
+  --surface-elevated:   var(--momen-gray-800);
+  --surface-overlay:    rgba(10, 10, 15, 0.85);
+
+  --text-primary:       var(--momen-gray-100);
+  --text-secondary:     var(--momen-gray-400);
+  --text-tertiary:      var(--momen-gray-600);
+  --text-inverse:       var(--momen-gray-950);
+
+  --border-subtle:      var(--momen-gray-800);
+  --border-default:     var(--momen-gray-700);
+  --border-strong:      var(--momen-gray-600);
+
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-xl:   0 16px 48px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(91, 141, 239, 0.15);
+}
+
+/* ── Manual Light Override ───────────────────────────────── */
+[data-theme="light"] {
+  --surface-primary:    var(--momen-cream);
+  --surface-secondary:  var(--momen-warm-white);
+  --surface-elevated:   var(--momen-white);
+  --surface-overlay:    rgba(250, 248, 245, 0.9);
+
+  --text-primary:       var(--momen-gray-950);
+  --text-secondary:     var(--momen-gray-600);
+  --text-tertiary:      var(--momen-gray-500);
+  --text-inverse:       var(--momen-white);
+
+  --border-subtle:      var(--momen-gray-200);
+  --border-default:     var(--momen-gray-300);
+  --border-strong:      var(--momen-gray-400);
+
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-xl:   0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 20px rgba(91, 141, 239, 0.1);
+}
