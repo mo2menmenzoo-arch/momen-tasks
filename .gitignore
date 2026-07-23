@@ -7,9 +7,6 @@ node_modules/
 dist/
 build/
 .vercel/
-api/index.js
-api/index.d.ts
-api/index.js.map
 
 # Environment
 .env

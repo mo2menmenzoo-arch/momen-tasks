@@ -5,12 +5,12 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { AppModule } from '../src/app.module';
-import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
-import { PrismaExceptionFilter } from '../src/common/filters/prisma-exception.filter';
-import { LoggingInterceptor } from '../src/common/interceptors/logging.interceptor';
-import { TransformInterceptor } from '../src/common/interceptors/transform.interceptor';
-import { TimeoutInterceptor } from '../src/common/interceptors/timeout.interceptor';
+import { AppModule } from '../dist/app.module';
+import { HttpExceptionFilter } from '../dist/common/filters/http-exception.filter';
+import { PrismaExceptionFilter } from '../dist/common/filters/prisma-exception.filter';
+import { LoggingInterceptor } from '../dist/common/interceptors/logging.interceptor';
+import { TransformInterceptor } from '../dist/common/interceptors/transform.interceptor';
+import { TimeoutInterceptor } from '../dist/common/interceptors/timeout.interceptor';
 
 let cachedServer: any;
 
