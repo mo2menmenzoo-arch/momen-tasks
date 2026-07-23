@@ -3,19 +3,6 @@
   "buildCommand": "npm run vercel:build",
   "installCommand": "npm install && cd frontend && npm install",
   "outputDirectory": "frontend/dist",
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["src/**", "node_modules/**"]
-      }
-    },
-    {
-      "src": "frontend/dist/**",
-      "use": "@vercel/static"
-    }
-  ],
   "routes": [
     {
       "src": "/api/(.*)",
