@@ -46,8 +46,10 @@ frontend/.vite/
 # Build artifacts (tsc incremental builds)
 *.tsbuildinfo
 
+# AI agent config
+.agents/
+.opencode/
+
 # Misc
 *.log
 .cache/
-
-.vercel

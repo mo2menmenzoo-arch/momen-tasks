@@ -64,7 +64,10 @@ export async function apiRequest<T>(endpoint: string, options?: RequestInit): Pr
   }
 
   const body = await response.json();
-  return body.data;
+  if (body && typeof body === 'object' && 'success' in body && 'timestamp' in body) {
+    return body.data;
+  }
+  return body;
 }
 
 export function getApiBase(): string {
