@@ -19,7 +19,25 @@
 - Kill switch: `loop-pause-all` — pause schedulers and notify human
 - Estimate: `npx @cobusgreyling/loop-cost --pattern daily-triage`
 
+## Worktree Isolation
+
+- All fix attempts MUST use a separate worktree (`git worktree add`) or a fresh branch — never modify main branch files directly.
+- After verifier approves, merge via PR (draft → human review → ready).
+- Reference: `using-git-worktrees` skill.
+
+## Skills
+
+| Skill | Location | Purpose |
+|-------|----------|---------|
+| loop-triage | `.grok/skills/loop-triage/` | Triage changes, issues, CI |
+| loop-verifier | `.grok/skills/loop-verifier/` | Maker/checker verification |
+| minimal-fix | `.grok/skills/minimal-fix/` | Surgical one-issue fixes |
+| loop-budget | `.grok/skills/loop-budget/` | Token budget enforcement |
+| loop-constraints | `.grok/skills/loop-constraints/` | Binding rules enforcement |
+
 ## Links
 
-- Pattern: [daily-triage](../../patterns/daily-triage.md)
+- Pattern: `patterns/registry.yaml`
+- Safety: `docs/safety.md`
+- Harness: `.foundry/stack.yaml`
 - Checklist: [loop-design-checklist](../../docs/loop-design-checklist.md)

@@ -1,0 +1,16 @@
+name: loop-audit
+on:
+  schedule:
+    - cron: "0 8 * * 1"  # every Monday 8am
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx @cobusgreyling/loop audit . --suggest
+      - run: npx @cobusgreyling/loop doctor .

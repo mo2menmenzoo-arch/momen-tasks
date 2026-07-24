@@ -1,0 +1,22 @@
+patterns:
+  - id: daily-triage
+    version: 1.0.0
+    description: >
+      Daily triage of recent changes, CI failures, issues, and conversations.
+      Produces concise actionable findings report. Report-only in week one.
+    cadence: 1d
+    tool: grok
+    state_file: STATE.md
+    required_skills:
+      - loop-triage
+      - loop-verifier
+      - minimal-fix
+    budget:
+      daily_tokens: 100000
+      max_runs_per_day: 2
+      max_sub_agent_spawns: 0  # L1; switch to 2 at L2
+    gates:
+      - No auto-fix until L2 checklist complete
+      - All high-risk paths: human review required
+    verifier: loop-verifier
+    safety: docs/safety.md

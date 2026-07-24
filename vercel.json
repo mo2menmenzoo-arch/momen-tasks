@@ -3,15 +3,19 @@
   "buildCommand": "npm run vercel:build",
   "installCommand": "npm install && cd frontend && npm install",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "node_modules/.prisma/client/**"
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["node_modules/.prisma/client/**"]
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index"
+      "dest": "api/index"
     },
     {
       "handle": "filesystem"
@@ -21,8 +25,4 @@
       "dest": "/frontend/dist/index.html"
     }
   ],
-  "env": {
-    "PRISMA_CLI_QUERY_ENGINE_TYPE": "library",
-    "PRISMA_CLIENT_ENGINE_TYPE": "library"
-  }
 }
