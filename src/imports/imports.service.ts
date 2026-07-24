@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CsvImportDto } from './dto/csv-import.dto';
 import { TodoistImportDto } from './dto/todoist-import.dto';
@@ -9,11 +9,15 @@ import { Queue } from 'bullmq';
 export class ImportsService {
   constructor(
     private readonly prisma: PrismaService,
-    @InjectQueue('import') private readonly importQueue: Queue,
+    @Optional() @InjectQueue('import') private readonly importQueue: Queue,
   ) {}
 
   async importCsv(userId: string, csvImportDto: CsvImportDto): Promise<{ jobId: string; message: string }> {
     const jobId = `csv-import-${userId}-${Date.now()}`;
+
+    if (!this.importQueue) {
+      return { jobId, message: 'Import not available in serverless mode.' };
+    }
 
     await this.importQueue.add(
       'process-csv-import',
@@ -38,6 +42,10 @@ export class ImportsService {
   async importTodoist(userId: string, todoistImportDto: TodoistImportDto): Promise<{ jobId: string; message: string }> {
     const jobId = `todoist-import-${userId}-${Date.now()}`;
 
+    if (!this.importQueue) {
+      return { jobId, message: 'Import not available in serverless mode.' };
+    }
+
     await this.importQueue.add(
       'process-todoist-import',
       {
@@ -58,6 +66,9 @@ export class ImportsService {
   }
 
   async getJobStatus(jobId: string): Promise<any> {
+    if (!this.importQueue) {
+      return null;
+    }
     const job = await this.importQueue.getJob(jobId);
     if (!job) {
       return null;

@@ -3,19 +3,15 @@
   "buildCommand": "npm run vercel:build",
   "installCommand": "npm install && cd frontend && npm install",
   "outputDirectory": "frontend/dist",
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["node_modules/.prisma/client/**"]
-      }
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "node_modules/.prisma/client/**"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/index"
+      "dest": "/api/index"
     },
     {
       "handle": "filesystem"

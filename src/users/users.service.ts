@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,7 +15,7 @@ import { Queue } from 'bullmq';
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    @InjectQueue('export') private readonly exportQueue: Queue,
+    @Optional() @InjectQueue('export') private readonly exportQueue: Queue,
   ) {}
 
   async getProfile(userId: string): Promise<UserEntity> {
@@ -71,14 +72,21 @@ export class UsersService {
   ): Promise<{ message: string; exportId: string }> {
     const exportId = `export_${userId}_${Date.now()}`;
 
-    await this.exportQueue.add('generate-export', {
-      userId,
-      exportId,
-      format,
-    });
+    if (this.exportQueue) {
+      await this.exportQueue.add('generate-export', {
+        userId,
+        exportId,
+        format,
+      });
+
+      return {
+        message: 'Data export request submitted. You will receive an email when ready.',
+        exportId,
+      };
+    }
 
     return {
-      message: 'Data export request submitted. You will receive an email when ready.',
+      message: 'Export is not available in serverless mode.',
       exportId,
     };
   }

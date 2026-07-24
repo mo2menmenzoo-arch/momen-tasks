@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationQueryDto } from './dto/notification-query.dto';
@@ -13,7 +14,7 @@ import { Queue } from 'bullmq';
 export class NotificationsService {
   constructor(
     private readonly prisma: PrismaService,
-    @InjectQueue('notification') private readonly notificationQueue: Queue,
+    @Optional() @InjectQueue('notification') private readonly notificationQueue: Queue,
   ) {}
 
   async findAll(userId: string, query: NotificationQueryDto): Promise<NotificationEntity[]> {
@@ -96,18 +97,20 @@ export class NotificationsService {
       },
     });
 
-    await this.notificationQueue.add(
-      'dispatch-notification',
-      {
-        notificationId: notification.id,
-        userId,
-        type,
-        payload,
-      },
-      {
-        delay: scheduledAt.getTime() - Date.now(),
-      },
-    );
+    if (this.notificationQueue) {
+      await this.notificationQueue.add(
+        'dispatch-notification',
+        {
+          notificationId: notification.id,
+          userId,
+          type,
+          payload,
+        },
+        {
+          delay: scheduledAt.getTime() - Date.now(),
+        },
+      );
+    }
 
     return NotificationEntity.fromNotification(notification);
   }

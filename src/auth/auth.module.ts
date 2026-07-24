@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger, Provider } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { LoggerModule } from '../shared/logger/logger.module';
 import { AuthService } from './auth.service';
@@ -8,10 +8,34 @@ import { AuthController } from './auth.controller';
 import { TokenService } from './token.service';
 import { PasswordService } from './password.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
-import { AppleStrategy } from './strategies/apple.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { EmailVerifiedGuard } from './guards/email-verified.guard';
+
+const logger = new Logger('AuthModule');
+const providers: Provider[] = [
+  AuthService,
+  TokenService,
+  PasswordService,
+  JwtStrategy,
+  LocalStrategy,
+  EmailVerifiedGuard,
+];
+
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  const { GoogleStrategy } = require('./strategies/google.strategy');
+  providers.push(GoogleStrategy);
+  logger.log('Google OAuth strategy enabled');
+} else {
+  logger.warn('Google OAuth disabled — missing GOOGLE_CLIENT_ID/SECRET');
+}
+
+if (process.env.APPLE_CLIENT_ID) {
+  const { AppleStrategy } = require('./strategies/apple.strategy');
+  providers.push(AppleStrategy);
+  logger.log('Apple OAuth strategy enabled');
+} else {
+  logger.warn('Apple OAuth disabled — missing APPLE_CLIENT_ID');
+}
 
 @Module({
   imports: [
@@ -20,17 +44,8 @@ import { EmailVerifiedGuard } from './guards/email-verified.guard';
     ConfigModule,
     LoggerModule,
   ],
-  providers: [
-    AuthService,
-    TokenService,
-    PasswordService,
-    JwtStrategy,
-    GoogleStrategy,
-    AppleStrategy,
-    LocalStrategy,
-    EmailVerifiedGuard,
-  ],
+  providers,
   controllers: [AuthController],
-  exports: [AuthService, TokenService, PasswordService, EmailVerifiedGuard],
+  exports: [AuthService, TokenService, PasswordService, EmailVerifiedGuard, JwtModule],
 })
 export class AuthModule {}
