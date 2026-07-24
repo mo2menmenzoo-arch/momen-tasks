@@ -61,6 +61,7 @@ export default async function handler(req: any, res: any) {
       success: false,
       error: 'Server initialization failed',
       message: initError.message,
+      stack: initError.stack,
     }));
   }
 
@@ -76,6 +77,7 @@ export default async function handler(req: any, res: any) {
         success: false,
         error: 'Server initialization failed',
         message: error.message,
+        stack: error.stack,
       }));
     }
   }
