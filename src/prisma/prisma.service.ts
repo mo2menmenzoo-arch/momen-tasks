@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 
@@ -7,6 +7,9 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly logger = new Logger(PrismaService.name);
+  private connected = false;
+
   constructor(configService: ConfigService) {
     super({
       datasources: {
@@ -14,20 +17,39 @@ export class PrismaService
           url: configService.get<string>('DATABASE_CONFIG.url'),
         },
       },
-      log: ['query', 'error', 'warn'],
     });
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await super.$connect();
+      this.connected = true;
+      this.logger.log('Database connected');
+    } catch (error: any) {
+      this.logger.error(`Database connection failed: ${error.message}`);
+    }
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
+    if (this.connected) {
+      await this.$disconnect();
+    }
+  }
+
+  async ensureConnected() {
+    if (!this.connected) {
+      try {
+        await super.$connect();
+        this.connected = true;
+      } catch (error: any) {
+        this.logger.error(`Database reconnect failed: ${error.message}`);
+        throw error;
+      }
+    }
   }
 
   async setRlsContext(userId: string) {
-    await this.$executeRawUnsafe(
+    await super.$executeRawUnsafe(
       'SET LOCAL app.current_user_id = $1',
       userId,
     );
