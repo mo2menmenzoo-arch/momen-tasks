@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
   UseGuards,
@@ -9,8 +10,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { TokenService } from './token.service';
+import { AppLoggerService } from '../shared/logger/logger.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { MagicLinkDto } from './dto/magic-link.dto';
@@ -23,6 +26,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
+    private readonly logger: AppLoggerService,
   ) {}
 
   @Post('signup')
@@ -79,6 +83,32 @@ export class AuthController {
     );
     this.setTokens(res, result.accessToken, tokens.refreshToken);
     return res.json(result);
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleCallback(@Req() req: Request, @Res() res: Response) {
+    try {
+      this.logger.log('Google OAuth callback received', 'AuthController');
+      const result = await this.authService.googleCallback(req.user);
+      const tokens = await this.tokenService.issueTokens(
+        result.user.id,
+        result.user.email,
+      );
+      this.setTokens(res, result.accessToken, tokens.refreshToken);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      this.logger.log(`Google OAuth success, redirecting to ${frontendUrl}/auth/callback`, 'AuthController');
+      return res.redirect(`${frontendUrl}/auth/callback?user=${encodeURIComponent(JSON.stringify(result.user))}&token=${encodeURIComponent(result.accessToken)}`);
+    } catch (error: any) {
+      this.logger.error(`Google OAuth callback error: ${error.message}`, error.stack, 'AuthController');
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const errorMessage = encodeURIComponent(error.message || 'Google authentication failed');
+      return res.redirect(`${frontendUrl}/login?error=${errorMessage}`);
+    }
   }
 
   @Post('google')

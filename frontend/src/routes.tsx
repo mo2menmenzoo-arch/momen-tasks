@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/common/Skeleton';
 
 const Landing = lazy(() => import('@/pages/Landing').then(m => ({ default: m.Landing })));
 const Auth = lazy(() => import('@/pages/Auth').then(m => ({ default: m.Auth })));
+const AuthCallback = lazy(() => import('@/pages/AuthCallback').then(m => ({ default: m.AuthCallback })));
 const Onboarding = lazy(() => import('@/pages/Onboarding').then(m => ({ default: m.Onboarding })));
 const Today = lazy(() => import('@/pages/Today').then(m => ({ default: m.Today })));
 const Calendar = lazy(() => import('@/pages/Calendar').then(m => ({ default: m.Calendar })));
@@ -59,6 +60,10 @@ export const routes = [
       { path: 'profile', element: <Suspense fallback={<LoadingFallback />}><Profile /></Suspense> },
       { path: 'onboarding', element: <Suspense fallback={<LoadingFallback />}><Onboarding /></Suspense> },
     ],
+  },
+  {
+    path: '/auth/callback',
+    element: <Suspense fallback={<LoadingFallback />}><AuthCallback /></Suspense>,
   },
   { path: '*', element: <Navigate to="/" replace /> },
 ];

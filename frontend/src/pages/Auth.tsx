@@ -7,7 +7,7 @@ import { useLogin, useSignup, useMagicLink } from '@/hooks/useAuth';
 import { showToast } from '@/components/common/Toast';
 import { GeometricPattern } from '@/components/common/GeometricPattern';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
 const FRONTEND_URL = window.location.origin;
 
 export function Auth() {
@@ -52,7 +52,7 @@ export function Auth() {
     const top = window.screenY + (window.outerHeight - height) / 2;
 
     const popup = window.open(
-      `${API_URL.replace('/api/v1', '')}/auth/google`,
+      `${API_URL}/auth/google`,
       'google-oauth',
       `width=${width},height=${height},left=${left},top=${top}`,
     );

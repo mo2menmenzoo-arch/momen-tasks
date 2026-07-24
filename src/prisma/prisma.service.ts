@@ -28,7 +28,8 @@ export class PrismaService
 
   async setRlsContext(userId: string) {
     await this.$executeRawUnsafe(
-      `SET LOCAL app.current_user_id = '${userId}'`,
+      'SET LOCAL app.current_user_id = $1',
+      userId,
     );
   }
 }

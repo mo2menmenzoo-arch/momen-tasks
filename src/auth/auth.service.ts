@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 import { CryptoUtil } from '../common/utils/crypto.util';
+import { AppLoggerService } from '../shared/logger/logger.service';
 import { AuthResponse, TokenSet } from './interfaces/auth-response.interface';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
     private readonly configService: ConfigService,
+    private readonly logger: AppLoggerService,
   ) {}
 
   async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -34,7 +36,7 @@ export class AuthService {
     const hashedPassword = await this.passwordService.hash(signupDto.password);
     const verificationToken = CryptoUtil.generateSecureToken(32);
 
-    await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         email: signupDto.email,
         passwordHash: hashedPassword,
@@ -43,6 +45,8 @@ export class AuthService {
         emailVerified: false,
       },
     });
+
+    this.logger.log(`User created: ${user.id} (${user.email})`, 'AuthService');
 
     await this.prisma.$executeRaw`
       INSERT INTO "EmailVerificationToken" (id, email, token, "expiresAt", "createdAt")
@@ -89,6 +93,7 @@ export class AuthService {
     });
 
     if (!user) {
+      this.logger.warn(`Login failed: user not found for ${loginDto.email}`, 'AuthService');
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -99,12 +104,14 @@ export class AuthService {
     }
 
     if (!user.emailVerified) {
+      this.logger.warn(`Login failed: email not verified for ${loginDto.email}`, 'AuthService');
       throw new UnauthorizedException(
         'Please verify your email before logging in',
       );
     }
 
     const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    this.logger.log(`Login successful: ${user.id} (${user.email})`, 'AuthService');
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -271,6 +278,8 @@ export class AuthService {
     const displayName = profile.displayName;
     const avatarUrl = profile.photos?.[0]?.value;
 
+    this.logger.log(`Google OAuth callback for: ${email}`, 'AuthService');
+
     let user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -405,7 +414,7 @@ export class AuthService {
   ): Promise<void> {
     const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
     if (!resendApiKey) {
-      console.log(`[EMAIL] To: ${to}, Subject: ${subject}, Body: ${html}`);
+      this.logger.warn(`RESEND_API_KEY not set. Email not sent to ${to}. Subject: ${subject}`, 'AuthService');
       return;
     }
 
@@ -427,7 +436,7 @@ export class AuthService {
         },
       );
     } catch (error: any) {
-      console.error('Failed to send email:', error.message);
+      this.logger.error(`Failed to send email to ${to}: ${error.response?.data || error.message}`, undefined, 'AuthService');
     }
   }
 

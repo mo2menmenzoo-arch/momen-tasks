@@ -49,3 +49,12 @@ Skills are installed in `C:\Users\Momen\.agents\skills\`. Invoke relevant skills
 - `writing-skills` — writing documentation and instructions
 - `caveman` — token-efficient communication
 - `graphify` — knowledge graph for codebase exploration
+
+## Custom Agents
+
+### QA-Debugger (`.opencode/agents/qa-debugger.md`)
+Quality Assurance, Verification & Debugging Specialist with dual-mode operation:
+- **VERIFY/AUDIT MODE**: Read-only inspection, health reports, pass/fail analysis
+- **DEBUG/FIX MODE**: Systematic debugging, root cause analysis, minimal surgical fixes
+- Always runs verification loops before completing tasks
+- Skills: brainstorming, systematic-debugging, verification-before-completion, verification-loop, test-driven-development, requesting-code-review, receiving-code-review, grill-me

@@ -13,6 +13,9 @@ build/
 .env.local
 .env.*.local
 
+# Secrets
+recovery-codes.txt
+
 # IDE
 .vscode/
 .idea/
@@ -39,6 +42,9 @@ prisma/migrations/
 # Frontend
 frontend/dist/
 frontend/.vite/
+
+# Build artifacts (tsc incremental builds)
+*.tsbuildinfo
 
 # Misc
 *.log

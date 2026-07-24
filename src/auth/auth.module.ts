@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { LoggerModule } from '../shared/logger/logger.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { TokenService } from './token.service';
@@ -17,6 +18,7 @@ import { EmailVerifiedGuard } from './guards/email-verified.guard';
     PassportModule,
     JwtModule.register({}),
     ConfigModule,
+    LoggerModule,
   ],
   providers: [
     AuthService,

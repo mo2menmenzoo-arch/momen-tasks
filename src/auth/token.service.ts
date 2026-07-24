@@ -29,14 +29,14 @@ export class TokenService {
     });
   }
 
-  generateRefreshToken(userId: string, email: string): string {
+  async generateRefreshToken(userId: string, email: string): Promise<string> {
     const token = CryptoUtil.generateSecureToken(32);
     const tokenHash = CryptoUtil.hashToken(token);
     const familyId = CryptoUtil.generateSecureToken(16);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    this.prisma.refreshToken.create({
+    await this.prisma.refreshToken.create({
       data: {
         userId,
         tokenHash,
@@ -50,7 +50,7 @@ export class TokenService {
 
   async issueTokens(userId: string, email: string): Promise<TokenSet> {
     const accessToken = this.generateAccessToken(userId, email);
-    const refreshToken = this.generateRefreshToken(userId, email);
+    const refreshToken = await this.generateRefreshToken(userId, email);
     return { accessToken, refreshToken };
   }
 
@@ -90,7 +90,7 @@ export class TokenService {
       data: { revokedAt: new Date() },
     });
 
-    const newRefreshToken = this.generateRefreshToken(userId, email);
+    const newRefreshToken = await this.generateRefreshToken(userId, email);
     await this.prisma.refreshToken.update({
       where: { tokenHash: CryptoUtil.hashToken(newRefreshToken) },
       data: {

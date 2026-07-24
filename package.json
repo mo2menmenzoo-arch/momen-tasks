@@ -97,10 +97,9 @@
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
+    "roots": ["<rootDir>"],
     "transform": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.json"
-      }
+      "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "tsconfig.json" }]
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
