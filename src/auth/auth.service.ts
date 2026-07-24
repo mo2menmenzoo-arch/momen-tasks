@@ -61,7 +61,6 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
       where: { email },
-      select: { id: true, email: true, authProvider: true, emailVerified: true, passwordHash: true },
     });
 
     if (!user) {
@@ -84,7 +83,31 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return { sub: user.id, email: user.email };
+    return user;
+  }
+
+  async getUserData(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('User not found');
+    return this.sanitizeUser(user);
+  }
+
+  sanitizeUser(user: any) {
+    return {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      emailVerified: user.emailVerified,
+      authProvider: user.authProvider,
+      timezone: user.timezone,
+      themePreference: user.themePreference,
+      subscriptionTier: user.subscriptionTier,
+      energyHours: user.energyHours,
+      notificationPrefs: user.notificationPrefs,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponse> {

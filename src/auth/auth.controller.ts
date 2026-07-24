@@ -8,6 +8,7 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
@@ -36,36 +37,33 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
-    const result = await this.authService.login(loginDto);
-    const tokens = await this.tokenService.issueTokens(
-      result.user.id,
-      result.user.email,
-    );
-    this.setTokens(res, result.accessToken, tokens.refreshToken);
-    return res.json(result);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    this.setTokens(res, tokens.accessToken, tokens.refreshToken);
+    return { user: this.authService.sanitizeUser(user), accessToken: tokens.accessToken };
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: Request, @Res() res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refreshToken;
     await this.authService.logout(refreshToken);
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-    return res.json({ message: 'Logged out successfully' });
+    return { message: 'Logged out successfully' };
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ message: 'No refresh token provided' });
+      throw new UnauthorizedException('No refresh token provided');
     }
     const result = await this.authService.refresh(refreshToken);
     this.setTokens(res, result.accessToken, refreshToken);
-    return res.json(result);
+    return result;
   }
 
   @Post('magic-link')
@@ -75,14 +73,14 @@ export class AuthController {
 
   @Post('magic-link/verify')
   @HttpCode(HttpStatus.OK)
-  async verifyMagicLink(@Body('token') token: string, @Res() res: Response) {
+  async verifyMagicLink(@Body('token') token: string, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.verifyMagicLink(token);
     const tokens = await this.tokenService.issueTokens(
       result.user.id,
       result.user.email,
     );
     this.setTokens(res, result.accessToken, tokens.refreshToken);
-    return res.json(result);
+    return result;
   }
 
   @Get('google')
@@ -117,14 +115,14 @@ export class AuthController {
   }
 
   @Post('apple')
-  async appleLogin(@Body('identityToken') identityToken: string, @Res() res: Response) {
+  async appleLogin(@Body('identityToken') identityToken: string, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.appleLogin(identityToken);
     const tokens = await this.tokenService.issueTokens(
       result.user.id,
       result.user.email,
     );
     this.setTokens(res, result.accessToken, tokens.refreshToken);
-    return res.json(result);
+    return result;
   }
 
   @Post('verify-email')

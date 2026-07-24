@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, DynamicModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -26,24 +26,15 @@ import { JobsModule } from './jobs/jobs.module';
 import { RlsMiddleware } from './common/middleware/rls.middleware';
 import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
 
-@Module({
-  imports: [
+const isServerless = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+
+function getDynamicImports(): any[] {
+  const imports: any[] = [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration, databaseConfig, jwtConfig, redisConfig, bullmqConfig],
     }),
     ScheduleModule.forRoot(),
-    BullModule.forRootAsync({
-      useFactory: (redisConfig: any) => ({
-        connection: {
-          host: redisConfig.host,
-          port: redisConfig.port,
-          password: redisConfig.password,
-          tls: redisConfig.tls,
-        },
-      }),
-      inject: ['REDIS_CONFIG'],
-    }),
     LoggerModule,
     PrismaModule,
     AuthModule,
@@ -56,9 +47,31 @@ import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
     SyncModule,
     ClarityEngineModule,
     ImportsModule,
-    RealtimeModule,
-    JobsModule,
-  ],
+  ];
+
+  if (!isServerless) {
+    imports.push(
+      BullModule.forRootAsync({
+        useFactory: (redisConfig: any) => ({
+          connection: {
+            host: redisConfig.host,
+            port: redisConfig.port,
+            password: redisConfig.password,
+            tls: redisConfig.tls,
+          },
+        }),
+        inject: ['REDIS_CONFIG'],
+      }),
+      RealtimeModule,
+      JobsModule,
+    );
+  }
+
+  return imports;
+}
+
+@Module({
+  imports: getDynamicImports(),
   controllers: [AppController],
   providers: [AppService],
 })
