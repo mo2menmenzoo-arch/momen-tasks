@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { AppModule } from './app.module';
@@ -15,6 +14,10 @@ import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
 let cachedServer: any;
 let initError: Error | null = null;
 
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
+
 async function createServer() {
   const expressApp = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
@@ -22,7 +25,6 @@ async function createServer() {
     logger: process.env.NODE_ENV === 'production' ? ['error', 'warn', 'log'] : ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
-  app.use(helmet({ crossOriginEmbedderPolicy: false }));
   app.use(cookieParser());
   app.enableCors({
     origin: process.env.FRONTEND_URL || '*',
