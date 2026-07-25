@@ -19,6 +19,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
+    "prisma:seed": "ts-node prisma/seed.ts",
     "vercel:build": "prisma generate && nest build && cd frontend && npm run build",
     "postinstall": "prisma generate"
   },

@@ -38,6 +38,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: signupDto.email,
+        username: signupDto.username,
         passwordHash: hashedPassword,
         displayName: signupDto.displayName || signupDto.email.split('@')[0],
         authProvider: 'EMAIL',
@@ -57,9 +58,14 @@ export class AuthService {
     return { message: 'Verification email sent. Please check your inbox.' };
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
+  async validateUser(login: string, password: string): Promise<any> {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: login },
+          { username: login },
+        ],
+      },
     });
 
     if (!user) {
@@ -95,6 +101,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
+      username: user.username ?? null,
       displayName: user.displayName,
       avatarUrl: user.avatarUrl,
       emailVerified: user.emailVerified,
@@ -102,6 +109,7 @@ export class AuthService {
       timezone: user.timezone,
       themePreference: user.themePreference,
       subscriptionTier: user.subscriptionTier,
+      role: user.role,
       energyHours: user.energyHours,
       notificationPrefs: user.notificationPrefs,
       createdAt: user.createdAt,
@@ -117,8 +125,8 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
-    const { userId, email } = await this.tokenService.verifyRefreshToken(refreshToken);
-    const tokens = await this.tokenService.rotateRefreshToken(refreshToken, userId, email);
+    const { userId } = await this.tokenService.verifyRefreshToken(refreshToken);
+    const tokens = await this.tokenService.rotateRefreshToken(refreshToken, userId);
     return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken };
   }
 
@@ -171,7 +179,7 @@ export class AuthService {
       });
     }
 
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const tokens = await this.tokenService.issueTokens(user.id);
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -294,7 +302,7 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const tokens = await this.tokenService.issueTokens(user.id);
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -323,7 +331,7 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const tokens = await this.tokenService.issueTokens(user.id);
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -439,6 +447,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        username: user.username ?? null,
         displayName: user.displayName,
         avatarUrl: user.avatarUrl,
         emailVerified: user.emailVerified,
@@ -446,6 +455,7 @@ export class AuthService {
         timezone: user.timezone,
         themePreference: user.themePreference,
         subscriptionTier: user.subscriptionTier,
+        role: user.role,
         energyHours: user.energyHours,
         notificationPrefs: user.notificationPrefs,
         createdAt: user.createdAt,

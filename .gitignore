@@ -53,3 +53,5 @@ frontend/.vite/
 # Misc
 *.log
 .cache/
+
+.vercel

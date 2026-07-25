@@ -21,6 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     return {
       sub: payload.sub,
       email: payload.email,
+      username: payload.username ?? null,
+      role: payload.role,
       type: payload.type,
     };
   }

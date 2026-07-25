@@ -4,6 +4,7 @@ export interface AuthResponse {
   user: {
     id: string;
     email: string;
+    username: string | null;
     displayName: string | null;
     avatarUrl: string | null;
     emailVerified: boolean;
@@ -11,6 +12,7 @@ export interface AuthResponse {
     timezone: string;
     themePreference: string;
     subscriptionTier: string;
+    role: string;
     energyHours: Record<string, unknown> | null;
     notificationPrefs: Record<string, unknown> | null;
     createdAt: Date;

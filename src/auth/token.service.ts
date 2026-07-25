@@ -14,10 +14,12 @@ export class TokenService {
     private readonly prisma: PrismaService,
   ) {}
 
-  generateAccessToken(userId: string, email: string): string {
+  generateAccessToken(userId: string, email: string, username?: string | null, role?: string): string {
     const payload: JwtPayload = {
       sub: userId,
       email,
+      username,
+      role: role || 'USER',
       type: 'access',
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 15 * 60,
@@ -29,7 +31,7 @@ export class TokenService {
     });
   }
 
-  async generateRefreshToken(userId: string, email: string): Promise<string> {
+  async generateRefreshToken(userId: string): Promise<string> {
     const token = CryptoUtil.generateSecureToken(32);
     const tokenHash = CryptoUtil.hashToken(token);
     const familyId = CryptoUtil.generateSecureToken(16);
@@ -48,16 +50,22 @@ export class TokenService {
     return token;
   }
 
-  async issueTokens(userId: string, email: string): Promise<TokenSet> {
-    const accessToken = this.generateAccessToken(userId, email);
-    const refreshToken = await this.generateRefreshToken(userId, email);
+  async issueTokens(userId: string): Promise<TokenSet> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, username: true, role: true },
+    });
+
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const accessToken = this.generateAccessToken(user.id, user.email, user.username, user.role);
+    const refreshToken = await this.generateRefreshToken(userId);
     return { accessToken, refreshToken };
   }
 
   async rotateRefreshToken(
     refreshToken: string,
     userId: string,
-    email: string,
   ): Promise<TokenSet> {
     const tokenHash = CryptoUtil.hashToken(refreshToken);
 
@@ -90,7 +98,14 @@ export class TokenService {
       data: { revokedAt: new Date() },
     });
 
-    const newRefreshToken = await this.generateRefreshToken(userId, email);
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, username: true, role: true },
+    });
+
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const newRefreshToken = await this.generateRefreshToken(userId);
     await this.prisma.refreshToken.update({
       where: { tokenHash: CryptoUtil.hashToken(newRefreshToken) },
       data: {
@@ -99,7 +114,7 @@ export class TokenService {
       },
     });
 
-    const accessToken = this.generateAccessToken(userId, email);
+    const accessToken = this.generateAccessToken(user.id, user.email, user.username, user.role);
     return { accessToken, refreshToken: newRefreshToken };
   }
 

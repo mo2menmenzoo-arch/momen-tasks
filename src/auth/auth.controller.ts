@@ -39,8 +39,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
-    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const user = await this.authService.validateUser(loginDto.login, loginDto.password);
+    const tokens = await this.tokenService.issueTokens(user.id);
     this.setTokens(res, tokens.accessToken, tokens.refreshToken);
     return { user: this.authService.sanitizeUser(user), accessToken: tokens.accessToken };
   }
@@ -78,7 +78,6 @@ export class AuthController {
     const result = await this.authService.verifyMagicLink(token);
     const tokens = await this.tokenService.issueTokens(
       result.user.id,
-      result.user.email,
     );
     this.setTokens(res, result.accessToken, tokens.refreshToken);
     return result;
@@ -96,7 +95,6 @@ export class AuthController {
       const result = await this.authService.googleCallback(req.user);
       const tokens = await this.tokenService.issueTokens(
         result.user.id,
-        result.user.email,
       );
       this.setTokens(res, result.accessToken, tokens.refreshToken);
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -120,7 +118,6 @@ export class AuthController {
     const result = await this.authService.appleLogin(identityToken);
     const tokens = await this.tokenService.issueTokens(
       result.user.id,
-      result.user.email,
     );
     this.setTokens(res, result.accessToken, tokens.refreshToken);
     return result;
