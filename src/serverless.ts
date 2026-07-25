@@ -23,7 +23,7 @@ async function createServer() {
 
   app.use(cookieParser());
   app.enableCors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: (process.env.FRONTEND_URL || '*').trim(),
     credentials: true,
   });
   app.enableVersioning({
