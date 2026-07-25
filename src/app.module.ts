@@ -1,5 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer, DynamicModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
@@ -52,15 +52,18 @@ function getDynamicImports(): any[] {
   if (!isServerless) {
     imports.push(
       BullModule.forRootAsync({
-        useFactory: (redisConfig: any) => ({
-          connection: {
-            host: redisConfig.host,
-            port: redisConfig.port,
-            password: redisConfig.password,
-            tls: redisConfig.tls,
-          },
-        }),
-        inject: ['REDIS_CONFIG'],
+        useFactory: (config: ConfigService) => {
+          const redisConfig = config.get('REDIS_CONFIG');
+          return {
+            connection: {
+              host: redisConfig?.host ?? 'localhost',
+              port: redisConfig?.port ?? 6379,
+              password: redisConfig?.password,
+              tls: redisConfig?.tls,
+            },
+          };
+        },
+        inject: [ConfigService],
       }),
       RealtimeModule,
       JobsModule,
