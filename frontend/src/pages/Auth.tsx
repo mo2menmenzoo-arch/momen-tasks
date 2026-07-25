@@ -31,6 +31,13 @@ export function Auth() {
       if (event.origin !== window.location.origin) return;
 
       if (event.data.type === 'AUTH_SUCCESS') {
+        const storedState = sessionStorage.getItem('google_oauth_state');
+        sessionStorage.removeItem('google_oauth_state');
+        if (storedState && event.data.state && event.data.state !== storedState) {
+          console.error('Auth: OAuth state mismatch - possible CSRF');
+          showToast('Authentication failed. Please try again.');
+          return;
+        }
         console.log('Auth: Google OAuth success via popup', event.data.user);
         const store = useAuthStore.getState();
         store.login(event.data.user as User, event.data.token);
@@ -115,19 +122,23 @@ export function Auth() {
         return;
       }
 
+      const state = crypto.randomUUID();
+      sessionStorage.setItem('google_oauth_state', state);
+
       const width = 500;
       const height = 600;
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
 
       const popup = window.open(
-        `${API_URL}/auth/google`,
+        `${API_URL}/auth/google?state=${state}`,
         'google-oauth',
         `width=${width},height=${height},left=${left},top=${top}`,
       );
 
       if (!popup || popup.closed) {
         console.error('Auth: Google OAuth popup was blocked');
+        sessionStorage.removeItem('google_oauth_state');
         showToast('Please allow popups for this site to sign in with Google');
         return;
       }
@@ -142,6 +153,7 @@ export function Auth() {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
           pollTimerRef.current = null;
           googlePopupRef.current = null;
+          sessionStorage.removeItem('google_oauth_state');
         }
       }, 500);
     } catch (error) {

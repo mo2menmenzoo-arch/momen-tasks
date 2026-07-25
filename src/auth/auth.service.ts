@@ -12,7 +12,6 @@ import { CryptoUtil } from '../common/utils/crypto.util';
 import { AppLoggerService } from '../shared/logger/logger.service';
 import { AuthResponse, TokenSet } from './interfaces/auth-response.interface';
 import { SignupDto } from './dto/signup.dto';
-import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -110,34 +109,6 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto): Promise<AuthResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: loginDto.email },
-    });
-
-    if (!user) {
-      this.logger.warn(`Login failed: user not found for ${loginDto.email}`, 'AuthService');
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    if (user.authProvider !== 'EMAIL') {
-      throw new UnauthorizedException(
-        `This account uses ${user.authProvider} authentication`,
-      );
-    }
-
-    if (!user.emailVerified) {
-      this.logger.warn(`Login failed: email not verified for ${loginDto.email}`, 'AuthService');
-      throw new UnauthorizedException(
-        'Please verify your email before logging in',
-      );
-    }
-
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
-    this.logger.log(`Login successful: ${user.id} (${user.email})`, 'AuthService');
-    return this.buildAuthResponse(user, tokens.accessToken);
-  }
-
   async logout(refreshToken?: string): Promise<{ message: string }> {
     if (refreshToken) {
       await this.tokenService.revokeRefreshToken(refreshToken);
@@ -145,10 +116,10 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
-  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
+  async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     const { userId, email } = await this.tokenService.verifyRefreshToken(refreshToken);
     const tokens = await this.tokenService.rotateRefreshToken(refreshToken, userId, email);
-    return { accessToken: tokens.accessToken };
+    return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken };
   }
 
   async revokeAllSessions(userId: string): Promise<{ message: string }> {

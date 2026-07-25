@@ -21,6 +21,7 @@ import { MagicLinkDto } from './dto/magic-link.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -62,7 +63,7 @@ export class AuthController {
       throw new UnauthorizedException('No refresh token provided');
     }
     const result = await this.authService.refresh(refreshToken);
-    this.setTokens(res, result.accessToken, refreshToken);
+    this.setTokens(res, result.accessToken, result.refreshToken);
     return result;
   }
 
@@ -84,7 +85,7 @@ export class AuthController {
   }
 
   @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleOAuthGuard)
   async googleAuth() {}
 
   @Get('google/callback')
@@ -100,7 +101,7 @@ export class AuthController {
       this.setTokens(res, result.accessToken, tokens.refreshToken);
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
       this.logger.log(`Google OAuth success, redirecting to ${frontendUrl}/auth/callback`, 'AuthController');
-      return res.redirect(`${frontendUrl}/auth/callback?user=${encodeURIComponent(JSON.stringify(result.user))}&token=${encodeURIComponent(result.accessToken)}`);
+      return res.redirect(`${frontendUrl}/auth/callback?user=${encodeURIComponent(JSON.stringify(result.user))}`);
     } catch (error: any) {
       this.logger.error(`Google OAuth callback error: ${error.message}`, error.stack, 'AuthController');
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
