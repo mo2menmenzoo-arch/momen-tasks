@@ -11,6 +11,8 @@ import { Request } from 'express';
 export interface JwtPayload {
   sub: string;
   email: string;
+  username?: string | null;
+  role: string;
   type: 'access';
   iat: number;
   exp: number;

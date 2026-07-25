@@ -19,5 +19,5 @@
     "resolveJsonModule": true,
     "declaration": true
   },
-  "exclude": ["frontend", "node_modules", "dist", "api"]
+  "exclude": ["frontend", "node_modules", "dist", "api", "prisma"]
 }
