@@ -21,8 +21,6 @@ export class TokenService {
       username,
       role: role || 'USER',
       type: 'access',
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 15 * 60,
     };
 
     return this.jwtService.sign(payload, {

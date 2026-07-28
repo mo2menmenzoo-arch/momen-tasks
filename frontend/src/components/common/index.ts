@@ -8,3 +8,4 @@ export { EmptyState } from './EmptyState';
 export { ProgressRing } from './ProgressRing';
 export { SegmentControl } from './SegmentControl';
 export { GeometricPattern } from './GeometricPattern';
+export { ButtonConfigProvider, useButtonConfig, DEFAULT_LOADING_DURATION } from './ButtonContext';

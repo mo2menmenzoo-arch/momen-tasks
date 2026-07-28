@@ -87,7 +87,7 @@ export function Onboarding() {
                 </button>
               ))}
             </div>
-            <Button onClick={handleZonesSubmit} disabled={selectedZones.length === 0}>Continue</Button>
+            <Button onClick={handleZonesSubmit} disabled={selectedZones.length === 0} loading={createZone.isPending}>Continue</Button>
           </div>
         )}
 
@@ -152,7 +152,7 @@ export function Onboarding() {
                   <Bell size={40} style={{ color: 'var(--accent-primary)' }} />
                 </div>
                 <Button size="lg" onClick={handleNotifications}>Enable Notifications</Button>
-                <button className="btn btn-ghost" onClick={() => setNotificationsEnabled(false)}>Skip for now</button>
+                <Button variant="ghost" onClick={() => setNotificationsEnabled(false)}>Skip for now</Button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)' }}>

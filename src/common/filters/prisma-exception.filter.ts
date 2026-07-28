@@ -39,6 +39,11 @@ export class PrismaExceptionFilter implements ExceptionFilter {
         message = 'Foreign key constraint violation';
         error = 'Bad Request';
         break;
+      case 'P2010':
+        status = 500;
+        message = 'Raw query execution failed';
+        error = 'Database Query Error';
+        break;
       case 'P2025':
         status = 404;
         message = 'Record not found';

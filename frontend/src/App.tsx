@@ -10,6 +10,7 @@ import { InstallPrompt } from './components/pwa/InstallPrompt';
 import { FocusSession } from './components/focus/FocusSession';
 import { TaskDetailSheet } from './components/task/TaskDetailSheet';
 import { CaptureModal } from './components/capture/CaptureModal';
+import { ToastContainer } from '@/components/common/Toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -86,6 +87,7 @@ export function App() {
         <FocusSession />
         <TaskDetailSheet />
         <CaptureModal />
+        <ToastContainer />
       </BrowserRouter>
     </QueryClientProvider>
   );

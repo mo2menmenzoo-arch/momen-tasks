@@ -48,7 +48,7 @@ export function Profile() {
           </div>
         </div>
         <Input label="Display Name" value={displayName} onChange={e => setDisplayName(e.target.value)} />
-        <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
+        <Button onClick={handleSave} loading={saving}>Save Changes</Button>
       </div>
 
       <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>

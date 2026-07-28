@@ -19,6 +19,7 @@ export function Auth() {
   const [name, setName] = useState('');
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
   const [showMagicLink, setShowMagicLink] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const googlePopupRef = useRef<Window | null>(null);
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -41,10 +42,12 @@ export function Auth() {
         console.log('Auth: Google OAuth success via popup', event.data.user);
         const store = useAuthStore.getState();
         store.login(event.data.user as User, event.data.token);
+        setGoogleLoading(false);
         navigate('/today', { replace: true });
       } else if (event.data.type === 'AUTH_ERROR') {
         console.error('Auth: Google OAuth error via popup', event.data.error);
         showToast(event.data.error || 'Google sign-in failed');
+        setGoogleLoading(false);
       }
     };
 
@@ -52,6 +55,7 @@ export function Auth() {
     return () => {
       window.removeEventListener('message', handleAuthMessage);
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+      setGoogleLoading(false);
     };
   }, [navigate]);
 
@@ -122,6 +126,7 @@ export function Auth() {
         return;
       }
 
+      setGoogleLoading(true);
       const state = crypto.randomUUID();
       sessionStorage.setItem('google_oauth_state', state);
 
@@ -139,6 +144,7 @@ export function Auth() {
       if (!popup || popup.closed) {
         console.error('Auth: Google OAuth popup was blocked');
         sessionStorage.removeItem('google_oauth_state');
+        setGoogleLoading(false);
         showToast('Please allow popups for this site to sign in with Google');
         return;
       }
@@ -153,11 +159,13 @@ export function Auth() {
           if (pollTimerRef.current) clearInterval(pollTimerRef.current);
           pollTimerRef.current = null;
           googlePopupRef.current = null;
+          setGoogleLoading(false);
           sessionStorage.removeItem('google_oauth_state');
         }
       }, 500);
     } catch (error) {
       console.error('Auth: Google OAuth initiation failed', error);
+      setGoogleLoading(false);
       showToast('Failed to start Google sign-in. Please try again.');
     }
   };
@@ -175,10 +183,10 @@ export function Auth() {
             {isSignUp && <Input label="Name" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" required />}
             <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
             <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" required />
-            <Button type="submit" style={{ width: '100%' }} disabled={login.isPending || signup.isPending}>{isSignUp ? 'Sign Up' : 'Log In'}</Button>
+            <Button type="submit" style={{ width: '100%' }} loading={login.isPending || signup.isPending}>{isSignUp ? 'Sign Up' : 'Log In'}</Button>
             <div className="divider" />
             <Button type="button" variant="secondary" style={{ width: '100%' }} onClick={() => setShowMagicLink(true)}><Mail size={16} /> Send Magic Link</Button>
-            <Button type="button" variant="ghost" style={{ width: '100%' }} onClick={handleGoogleLogin}>Continue with Google</Button>
+            <Button type="button" variant="ghost" style={{ width: '100%' }} onClick={handleGoogleLogin} loading={googleLoading}>Continue with Google</Button>
             <p className="body-sm text-secondary" style={{ textAlign: 'center' }}>
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button type="button" style={{ color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'var(--weight-medium)' }} onClick={() => setIsSignUp(!isSignUp)}>{isSignUp ? 'Log In' : 'Sign Up'}</button>
@@ -187,7 +195,7 @@ export function Auth() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <Input label="Email" type="email" value={magicLinkEmail} onChange={e => setMagicLinkEmail(e.target.value)} placeholder="you@example.com" />
-            <Button onClick={handleMagicLink} style={{ width: '100%' }} disabled={magicLink.isPending}>Send Magic Link</Button>
+            <Button onClick={handleMagicLink} style={{ width: '100%' }} loading={magicLink.isPending}>Send Magic Link</Button>
             <Button variant="ghost" onClick={() => setShowMagicLink(false)} style={{ width: '100%' }}>Back to login</Button>
           </div>
         )}

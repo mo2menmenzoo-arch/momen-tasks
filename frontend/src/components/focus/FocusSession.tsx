@@ -42,8 +42,8 @@ export function FocusSession() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)' }}>
           <h3 className="heading-lg">Session Complete</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%', maxWidth: 280 }}>
-            <Button variant="primary" onClick={handleComplete} style={{ width: '100%' }}>Mark Complete</Button>
-            <Button variant="secondary" onClick={handleEnd} style={{ width: '100%' }}>Take a Break</Button>
+            <Button variant="primary" onClick={handleComplete} style={{ width: '100%' }} loading={endFocus.isPending || updateTask.isPending}>Mark Complete</Button>
+            <Button variant="secondary" onClick={handleEnd} style={{ width: '100%' }} loading={endFocus.isPending}>Take a Break</Button>
             <Button variant="ghost" onClick={() => setShowEndPrompt(false)} style={{ width: '100%' }}>Continue</Button>
           </div>
         </div>
@@ -53,9 +53,9 @@ export function FocusSession() {
 
   return (
     <div className="focus-session">
-      <button className="btn btn-ghost btn-icon" onClick={handleEnd} style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)' }}>
+      <Button variant="ghost" icon onClick={handleEnd} loading={endFocus.isPending} style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)' }}>
         <X size={20} />
-      </button>
+      </Button>
 
       <Timer
         durationSeconds={session.durationSeconds}
@@ -75,7 +75,7 @@ export function FocusSession() {
         <Button variant="secondary" onClick={() => setIsPaused(!isPaused)}>
           <Pause size={16} /> {isPaused ? 'Resume' : 'Pause'}
         </Button>
-        <Button variant="danger" onClick={handleEnd}>End</Button>
+        <Button variant="danger" onClick={handleEnd} loading={endFocus.isPending}>End</Button>
       </div>
     </div>
   );

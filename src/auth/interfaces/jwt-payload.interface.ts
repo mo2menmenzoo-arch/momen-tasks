@@ -4,6 +4,4 @@ export interface JwtPayload {
   username?: string | null;
   role: string;
   type: 'access' | 'refresh';
-  iat: number;
-  exp: number;
 }

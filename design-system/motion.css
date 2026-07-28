@@ -120,6 +120,12 @@
   animation: pulse 2s var(--ease-default) infinite;
 }
 
+/* ── Spinner ──────────────────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ── Shimmer (loading skeleton) ──────────────────────────── */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }

@@ -54,4 +54,21 @@ frontend/.vite/
 *.log
 .cache/
 
+# Debugging artifacts
+backend.err
+server.err
+signup.json
+*.pdf
+*.html
+start-*.js
+test-*.js
+login-*.png
+screenshot-*.png
+
+# Vercel
 .vercel
+
+# Frontend test/output
+frontend/test-results/
+frontend/screenshot-*.png
+frontend/playwright*.ts

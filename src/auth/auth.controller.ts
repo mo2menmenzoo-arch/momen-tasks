@@ -39,7 +39,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
-    const user = await this.authService.validateUser(loginDto.login, loginDto.password);
+    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
     const tokens = await this.tokenService.issueTokens(user.id);
     this.setTokens(res, tokens.accessToken, tokens.refreshToken);
     return { user: this.authService.sanitizeUser(user), accessToken: tokens.accessToken };

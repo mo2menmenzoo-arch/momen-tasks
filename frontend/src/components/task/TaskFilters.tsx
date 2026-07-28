@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Filter } from 'lucide-react';
+import { Button } from '@/components/common/Button';
 import { Chip } from '@/components/common/Chip';
 import { useZones } from '@/hooks/useZones';
 import type { TaskFilters as TaskFiltersType } from '@/types';
@@ -18,10 +19,10 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
 
   return (
     <div>
-      <button className="btn btn-ghost btn-sm" onClick={() => setShowFilters(!showFilters)}>
+      <Button variant="ghost" size="sm" onClick={() => setShowFilters(!showFilters)}>
         <Filter size={16} />
         Filters
-      </button>
+      </Button>
       {showFilters && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-3)' }}>
           <div>

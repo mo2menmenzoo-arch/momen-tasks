@@ -14,8 +14,6 @@ export interface JwtPayload {
   username?: string | null;
   role: string;
   type: 'access';
-  iat: number;
-  exp: number;
 }
 
 @Injectable()
