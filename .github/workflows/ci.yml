@@ -20,6 +20,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
+      - name: Validate lockfile is in sync
+        run: node -e "const pj=require('./package.json');const pl=require('./package-lock.json');const deps={...pj.dependencies,...pj.devDependencies};const pkgs=Object.keys(pl.packages||{});const missing=Object.keys(deps).filter(d=>!pkgs.includes('node_modules/'+d));if(missing.length){console.log('MISSING from lockfile:',missing.join(', '));process.exit(1)}console.log('Lockfile valid —',Object.keys(deps).length,'packages in sync')"
+
       - run: npm ci
       - run: npx prisma generate
 
@@ -32,6 +35,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Coverage
+        run: npm run test:cov
+
   frontend:
     name: Frontend — typecheck + build
     runs-on: ubuntu-latest
@@ -43,10 +49,20 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Validate lockfile is in sync
+        working-directory: frontend
+        run: node -e "const pj=require('./package.json');const pl=require('./package-lock.json');const deps={...pj.dependencies,...pj.devDependencies};const pkgs=Object.keys(pl.packages||{});const missing=Object.keys(deps).filter(d=>!pkgs.includes('node_modules/'+d));if(missing.length){console.log('MISSING from lockfile:',missing.join(', '));process.exit(1)}console.log('Lockfile valid —',Object.keys(deps).length,'packages in sync')"
+
       - run: npm ci
         working-directory: frontend
 
       - name: Build (includes typecheck via tsc -b)
+        run: npm run build
+        working-directory: frontend
+
+      - name: Check bundle size
+        working-directory: frontend
+        run: node -e "const fs=require('fs');const assets=fs.readdirSync('./dist/assets').filter(f=>f.endsWith('.js'));let total=0;assets.forEach(f=>{const stat=fs.statSync('./dist/assets/'+f);const size=stat.size/1024;total+=size;if(size>300)console.log('WARNING:',f,'is',Math.round(size)+'KB (gzip will reduce)')});console.log('Total JS:',Math.round(total)+'KB');if(assets.some(f=>/^Review-.*\.js$/.test(f)&&fs.statSync('./dist/assets/'+f).size>50000)){console.log('ERROR: Review chunk >50KB — lazy-loading may have regressed');process.exit(1)}console.log('Bundle check passed — Review chunk is properly code-split')"
         run: npm run build
         working-directory: frontend
 
