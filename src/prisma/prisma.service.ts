@@ -30,8 +30,8 @@ export class PrismaService
       await super.$connect();
       this.connected = true;
       this.logger.log("Database connected");
-    } catch (error: any) {
-      this.logger.error(`Database connection failed: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Database connection failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -46,8 +46,9 @@ export class PrismaService
       try {
         await super.$connect();
         this.connected = true;
-      } catch (error: any) {
-        this.logger.error(`Database reconnect failed: ${error.message}`);
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.error(`Database reconnect failed: ${msg}`);
         throw error;
       }
     }
