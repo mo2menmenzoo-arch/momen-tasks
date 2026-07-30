@@ -4,6 +4,7 @@ import {
   BadRequestException,
   Optional,
 } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { NotificationQueryDto } from "./dto/notification-query.dto";
 import { NotificationEntity } from "./entities/notification.entity";
@@ -101,9 +102,11 @@ export class NotificationsService {
       data: {
         userId,
         taskId,
-        type: type as any,
+        // prisma-boundary: string->enum conversion
+        type: type as unknown as Prisma.NotificationCreateInput["type"],
         scheduledAt,
-        payload: payload as any,
+        // prisma-boundary: JSON payload
+        payload: payload as unknown as Prisma.NotificationCreateInput["payload"],
         status: "PENDING",
       },
     });

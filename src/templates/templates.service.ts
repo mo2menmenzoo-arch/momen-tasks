@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
 } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateTemplateDto } from "./dto/create-template.dto";
 import { UpdateTemplateDto } from "./dto/update-template.dto";
@@ -75,7 +76,8 @@ export class TemplatesService {
       data: {
         title: createTemplateDto.title,
         description: createTemplateDto.description,
-        taskBlueprint: createTemplateDto.taskBlueprint as any,
+        // prisma-boundary: JSON field
+        taskBlueprint: createTemplateDto.taskBlueprint as unknown as Prisma.InputJsonValue,
         isPublic: createTemplateDto.isPublic,
         authorId: userId,
       },
@@ -112,7 +114,7 @@ export class TemplatesService {
           description: updateTemplateDto.description,
         }),
         ...(updateTemplateDto.taskBlueprint !== undefined && {
-          taskBlueprint: updateTemplateDto.taskBlueprint as any,
+          taskBlueprint: updateTemplateDto.taskBlueprint as unknown as Prisma.InputJsonValue,
         }),
         ...(updateTemplateDto.isPublic !== undefined && {
           isPublic: updateTemplateDto.isPublic,
@@ -163,7 +165,16 @@ export class TemplatesService {
       throw new NotFoundException("Template not found");
     }
 
-    const blueprint = template.taskBlueprint as any;
+    // prisma-json: stored JSON cast to expected shape
+    interface BlueprintTask {
+      title: string;
+      notes?: string | null;
+      priority?: string;
+      tags?: string[];
+      estimatedEffortMinutes?: number;
+      subtasks?: BlueprintTask[];
+    }
+    const blueprint = template.taskBlueprint as unknown as { tasks: BlueprintTask[] };
     const taskIds: string[] = [];
 
     if (blueprint.tasks && Array.isArray(blueprint.tasks)) {
@@ -176,7 +187,8 @@ export class TemplatesService {
           data: {
             title,
             notes: taskData.notes,
-            priority: taskData.priority || "MEDIUM",
+            // prisma-boundary: string from JSON template to Prisma enum
+            priority: (taskData.priority || "MEDIUM") as unknown as Prisma.TaskCreateInput["priority"],
             zoneId: applyTemplateDto.zoneId,
             ownerId: userId,
             source: "TEMPLATE",
@@ -193,7 +205,7 @@ export class TemplatesService {
               data: {
                 title: subtaskData.title,
                 notes: subtaskData.notes,
-                priority: subtaskData.priority || "MEDIUM",
+                priority: (subtaskData.priority || "MEDIUM") as unknown as Prisma.TaskCreateInput["priority"],
                 zoneId: applyTemplateDto.zoneId,
                 ownerId: userId,
                 parentTaskId: task.id,

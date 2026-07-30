@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
@@ -105,8 +106,9 @@ export class TasksService {
         tags: createTaskDto.tags,
         blockedBy: createTaskDto.blockedBy,
         blocks: createTaskDto.blocks,
-        locationTrigger: createTaskDto.locationTrigger as any,
-        attachments: createTaskDto.attachments as any,
+        // prisma-boundary: JSON fields
+        locationTrigger: createTaskDto.locationTrigger as unknown as Prisma.InputJsonValue,
+        attachments: createTaskDto.attachments as unknown as Prisma.InputJsonValue,
         source: createTaskDto.source,
         zoneId: createTaskDto.zoneId,
         parentTaskId: createTaskDto.parentTaskId,
@@ -178,10 +180,10 @@ export class TasksService {
           blocks: updateTaskDto.blocks,
         }),
         ...(updateTaskDto.locationTrigger !== undefined && {
-          locationTrigger: updateTaskDto.locationTrigger as any,
+          locationTrigger: updateTaskDto.locationTrigger as unknown as Prisma.InputJsonValue,
         }),
         ...(updateTaskDto.attachments !== undefined && {
-          attachments: updateTaskDto.attachments as any,
+          attachments: updateTaskDto.attachments as unknown as Prisma.InputJsonValue,
         }),
         ...(updateTaskDto.source !== undefined && {
           source: updateTaskDto.source,
