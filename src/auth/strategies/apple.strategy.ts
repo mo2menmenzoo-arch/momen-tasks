@@ -34,9 +34,9 @@ export class AppleStrategy extends PassportStrategy(Strategy, "apple") {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: any,
+    profile: { email?: string; name?: string },
     done: VerifyCallback,
-  ): Promise<any> {
+  ): Promise<void> {
     const user = {
       email: profile.email,
       name: profile.name,

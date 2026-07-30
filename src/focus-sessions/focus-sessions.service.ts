@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ConflictException,
 } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { StartSessionDto } from "./dto/start-session.dto";
 import { EndSessionDto } from "./dto/end-session.dto";
@@ -18,7 +19,7 @@ export class FocusSessionsService {
     userId: string,
     query: SessionQueryDto,
   ): Promise<FocusSessionEntity[]> {
-    const where: any = {
+    const where: Prisma.FocusSessionWhereInput = {
       userId,
     };
 

@@ -21,10 +21,10 @@ export class SyncService {
     pushDto: PushChangesDto,
   ): Promise<{
     processed: number;
-    conflicts: any[];
+    conflicts: Array<Record<string, unknown>>;
     cursor: string;
   }> {
-    const conflicts: any[] = [];
+    const conflicts: Array<Record<string, unknown>> = [];
     let processed = 0;
 
     for (const change of pushDto.changes) {
@@ -43,7 +43,7 @@ export class SyncService {
           );
 
           if (conflict) {
-            conflicts.push(conflict);
+            conflicts.push({ ...conflict });
           }
 
           await this.prisma.task.update({
@@ -89,11 +89,11 @@ export class SyncService {
     userId: string,
     pullDto: PullChangesDto,
   ): Promise<{
-    changes: any[];
+    changes: unknown[];
     cursor: string;
   }> {
     const cursor = new Date(pullDto.cursor);
-    const changes: any[] = [];
+    const changes: unknown[] = [];
 
     for (const entityType of pullDto.entityTypes) {
       if (entityType === "task") {

@@ -363,7 +363,7 @@ export class AuthService {
 
       // Find the matching key
       const matchingKey = appleKeys.keys.find(
-        (key: any) => key.kid === header.kid,
+        (key: { kid?: string }) => key.kid === header.kid,
       );
       if (!matchingKey) {
         throw new UnauthorizedException("Invalid Apple token: no matching key");

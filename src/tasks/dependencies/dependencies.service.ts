@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
@@ -22,7 +23,13 @@ export class DependenciesService {
       throw new NotFoundException("Task not found");
     }
 
-    const dependencies: any[] = [];
+    const dependencies: Array<{
+      id: string;
+      type: "blocked_by" | "blocks" | "transitive_blocked_by";
+      taskId: string;
+      taskTitle: string;
+      taskStatus: string;
+    }> = [];
 
     for (const blockedById of task.blockedBy) {
       const blocker = await this.prisma.task.findUnique({

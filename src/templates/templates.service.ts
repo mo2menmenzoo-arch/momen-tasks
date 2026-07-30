@@ -19,14 +19,14 @@ export class TemplatesService {
     userId: string,
     query: TemplateQueryDto,
   ): Promise<TemplateEntity[]> {
-    const where: any = {
+    const where: Prisma.TemplateWhereInput = {
       OR: [
         { authorId: userId },
         ...(query.includePublic ? [{ isPublic: true, isModerated: true }] : []),
       ],
     };
 
-    if (query.search) {
+    if (query.search && where.OR && Array.isArray(where.OR)) {
       where.OR = [
         ...where.OR,
         {

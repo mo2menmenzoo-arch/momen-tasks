@@ -24,7 +24,7 @@ export class NotificationsService {
     userId: string,
     query: NotificationQueryDto,
   ): Promise<NotificationEntity[]> {
-    const where: any = {
+    const where: Prisma.NotificationWhereInput = {
       userId,
     };
 

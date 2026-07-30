@@ -16,7 +16,7 @@ export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(userId: string, query: TaskQueryDto): Promise<TaskEntity[]> {
-    const where: any = {
+    const where: Prisma.TaskWhereInput = {
       ownerId: userId,
       deletedAt: null,
     };
@@ -56,7 +56,7 @@ export class TasksService {
       where.NOT = { status: "COMPLETED" };
     }
 
-    const orderBy: any = {};
+    const orderBy: Prisma.TaskOrderByWithRelationInput = {};
     if (query.sortBy) {
       orderBy[query.sortBy] = query.sortOrder || "desc";
     } else {
@@ -236,8 +236,8 @@ export class TasksService {
         tags: string[];
         blocked_by: string[];
         blocks: string[];
-        location_trigger: any;
-        attachments: any;
+        location_trigger: unknown;
+        attachments: unknown;
         source: string;
         created_at: Date;
         updated_at: Date;
@@ -275,8 +275,9 @@ export class TasksService {
       tags: t.tags,
       blockedBy: t.blocked_by,
       blocks: t.blocks,
-      locationTrigger: t.location_trigger,
-      attachments: t.attachments,
+      // prisma-raw: JSON fields from raw query
+      locationTrigger: t.location_trigger as Record<string, unknown> | null,
+      attachments: t.attachments as Array<Record<string, unknown>> | null,
       source: t.source,
       createdAt: t.created_at,
       updatedAt: t.updated_at,
