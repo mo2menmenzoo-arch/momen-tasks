@@ -1,4 +1,4 @@
-﻿# Loop State - Momen Task
+# Loop State - Momen Task
 
 Last run: 2026-07-25T08:15:00Z
 
@@ -17,6 +17,14 @@ Last run: 2026-07-25T08:15:00Z
 | 2 | **High** | Added CSRF `state` parameter to Google OAuth popup flow. Frontend generates state via `crypto.randomUUID()`, stores in sessionStorage, passes through backend guard, verifies on callback. | `google-oauth.guard.ts` (new), `auth.controller.ts`, `auth.module.ts`, `Auth.tsx`, `AuthCallback.tsx` |
 | 3 | **Med** | Removed dead `login()` method from `auth.service.ts` (28 lines) — was never called, duplicated `validateUser()` + `issueTokens()` logic. | `auth.service.ts` |
 | 4 | **High** | Fixed refresh token rotation bug — `auth.service.refresh()` dropped the new refresh token from `rotateRefreshToken()`. Controller re-set the old (revoked) token in the cookie, causing "Refresh token reuse detected" on next refresh. | `auth.service.ts`, `auth.controller.ts` |
+
+## Fixes Applied (2026-07-30 Issues Three)
+
+| # | Severity | Fix | Files Changed |
+|---|----------|-----|---------------|
+| 1 | **Med** | Lockfile synced — eslint-plugin-prettier@5.5.6 was missing from lockfile after manual package.json edit. `npm ci` now installs it. Verified clean `npm ci` succeeds. | `package-lock.json` |
+| 2 | **Low** | Added `--passWithNoTests` to test:cov script. Also added 24 unit tests for DateUtil and CryptoUtil (pure utilities, zero dependencies, no mocking). | `package.json`, `src/common/utils/date.util.spec.ts`, `src/common/utils/crypto.util.spec.ts` |
+| 3 | **Med** | `React.lazy()` on RadarChart and ClarityTrend → Review chunk 12KB (was 440KB). recharts (364KB) deferred to card swipe. Added `manualChunks: { vendor }` to split main index 565KB → 158KB app + 407KB vendor. | `ReviewCardDeck.tsx`, `vite.config.ts` |
 
 ## Items Deferred (intentional)
 - Dynamic `require('axios')` / `require('jsonwebtoken')` — intentional for serverless tree-shaking, confirmed by git history
