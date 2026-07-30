@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Job } from "bullmq";
 import { PrismaService } from "../../prisma/prisma.service";
 import { Logger } from "@nestjs/common";
+import { TaskPriority } from "@prisma/client";
 
 @Processor("import")
 export class ImportProcessor extends WorkerHost {
@@ -76,8 +77,8 @@ export class ImportProcessor extends WorkerHost {
         imported,
         total: totalLines - 1,
       };
-    } catch (error: any) {
-      this.logger.error(`CSV import failed: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`CSV import failed: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }
@@ -100,7 +101,7 @@ export class ImportProcessor extends WorkerHost {
       if (Array.isArray(tasks)) {
         for (let i = 0; i < tasks.length; i++) {
           const task = tasks[i];
-          const priorityMap: Record<number, string> = {
+          const priorityMap: Record<number, TaskPriority> = {
             1: "LOW",
             2: "MEDIUM",
             3: "HIGH",
@@ -111,7 +112,7 @@ export class ImportProcessor extends WorkerHost {
             data: {
               title: task.content || task.title,
               notes: task.description,
-              priority: (priorityMap[task.priority] || "MEDIUM") as any,
+              priority: priorityMap[task.priority] ?? "MEDIUM",
               ownerId: userId,
               zoneId,
               source: "IMPORT",
@@ -134,8 +135,8 @@ export class ImportProcessor extends WorkerHost {
         imported,
         total: tasks.length,
       };
-    } catch (error: any) {
-      this.logger.error(`Todoist import failed: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Todoist import failed: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }

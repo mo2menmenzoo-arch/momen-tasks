@@ -50,8 +50,8 @@ export class CleanupProcessor extends WorkerHost {
       `;
 
       this.logger.log("Expired token cleanup completed");
-    } catch (error: any) {
-      this.logger.error(`Token cleanup failed: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Token cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }
@@ -88,8 +88,8 @@ export class CleanupProcessor extends WorkerHost {
       this.logger.log(`Purged ${tasks.count} soft-deleted tasks`);
 
       this.logger.log("Soft-deleted data purge completed");
-    } catch (error: any) {
-      this.logger.error(`Data purge failed: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Data purge failed: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }

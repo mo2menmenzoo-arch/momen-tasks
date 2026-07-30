@@ -53,9 +53,9 @@ export class WeeklyReviewProcessor extends WorkerHost {
       });
 
       this.logger.log(`Weekly review generated for user ${job.data.userId}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
-        `Failed to generate weekly review for user ${job.data.userId}: ${error.message}`,
+        `Failed to generate weekly review for user ${job.data.userId}: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw error;
     }

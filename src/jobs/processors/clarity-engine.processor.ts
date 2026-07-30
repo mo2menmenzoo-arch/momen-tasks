@@ -36,9 +36,9 @@ export class ClarityEngineProcessor extends WorkerHost {
       this.logger.log(
         `Clarity metric computed for user ${job.data.userId} on ${job.data.date}`,
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
-        `Failed to compute clarity metric for user ${job.data.userId}: ${error.message}`,
+        `Failed to compute clarity metric for user ${job.data.userId}: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw error;
     }

@@ -32,9 +32,9 @@ export class AppService {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
       dbConnected = true;
-    } catch (e: any) {
-      dbError = e.message;
-      this.logger.error(`Health check DB failed: ${e.message}`);
+    } catch (e: unknown) {
+      dbError = e instanceof Error ? e.message : String(e);
+      this.logger.error(`Health check DB failed: ${e instanceof Error ? e.message : String(e)}`);
     }
 
     const criticalVars = check(critical);

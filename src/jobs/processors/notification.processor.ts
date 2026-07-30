@@ -61,12 +61,12 @@ export class NotificationProcessor extends WorkerHost {
             where: { id: subscription.id },
             data: { lastUsedAt: new Date() },
           });
-        } catch (pushError: any) {
+        } catch (pushError: unknown) {
           this.logger.error(
-            `Failed to send push notification to ${subscription.endpoint}: ${pushError.message}`,
+            `Failed to send push notification to ${subscription.endpoint}: ${pushError instanceof Error ? pushError.message : String(pushError)}`,
           );
 
-          if (pushError.statusCode === 410) {
+          if (pushError instanceof Error && (pushError as { statusCode?: number }).statusCode === 410) {
             await this.prisma.pushSubscription.delete({
               where: { id: subscription.id },
             });
@@ -86,9 +86,9 @@ export class NotificationProcessor extends WorkerHost {
       });
 
       this.logger.log(`Notification ${notificationId} dispatched successfully`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
-        `Failed to dispatch notification ${job.data.notificationId}: ${error.message}`,
+        `Failed to dispatch notification ${job.data.notificationId}: ${error instanceof Error ? error.message : String(error)}`,
       );
 
       await this.prisma.notification.update({

@@ -75,8 +75,8 @@ export default async function handler(req: any, res: any) {
   if (!cachedServer) {
     try {
       cachedServer = await createServer();
-    } catch (error: any) {
-      initError = error;
+    } catch (error: unknown) {
+      initError = error instanceof Error ? error : new Error(String(error));
       console.error("Failed to initialize NestJS server:", error);
       res.statusCode = 500;
       res.setHeader("Content-Type", "application/json");
@@ -84,16 +84,16 @@ export default async function handler(req: any, res: any) {
         JSON.stringify({
           success: false,
           error: "Server initialization failed",
-          message: error.message,
-          stack: error.stack,
+          message: initError.message,
+          stack: initError.stack,
         }),
       );
     }
   }
   try {
     return cachedServer(req, res);
-  } catch (e: any) {
-    console.error("cachedServer error:", e.message);
+  } catch (e: unknown) {
+    console.error("cachedServer error:", e instanceof Error ? e.message : String(e));
     throw e;
   }
 }

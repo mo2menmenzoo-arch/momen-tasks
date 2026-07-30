@@ -69,8 +69,8 @@ export class ExportProcessor extends WorkerHost {
         format,
         size: JSON.stringify(exportData).length,
       };
-    } catch (error: any) {
-      this.logger.error(`Export generation failed: ${error.message}`);
+    } catch (error: unknown) {
+      this.logger.error(`Export generation failed: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }
