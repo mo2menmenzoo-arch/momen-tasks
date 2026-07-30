@@ -12,6 +12,7 @@ build/
 .env
 .env.local
 .env.*.local
+.env.vercel
 
 # Secrets
 recovery-codes.txt
@@ -50,6 +51,28 @@ frontend/.vite/
 .agents/
 .opencode/
 
+# Graph build artifacts
+graphify-out/
+
 # Misc
 *.log
 .cache/
+
+# Debugging artifacts
+backend.err
+server.err
+signup.json
+*.pdf
+*.html
+start-*.js
+test-*.js
+login-*.png
+screenshot-*.png
+
+# Vercel
+.vercel
+
+# Frontend test/output
+frontend/test-results/
+frontend/screenshot-*.png
+frontend/playwright*.ts

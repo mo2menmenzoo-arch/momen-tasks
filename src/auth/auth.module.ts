@@ -10,6 +10,7 @@ import { PasswordService } from './password.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { EmailVerifiedGuard } from './guards/email-verified.guard';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 
 const logger = new Logger('AuthModule');
 const providers: Provider[] = [
@@ -19,6 +20,7 @@ const providers: Provider[] = [
   JwtStrategy,
   LocalStrategy,
   EmailVerifiedGuard,
+  GoogleOAuthGuard,
 ];
 
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {

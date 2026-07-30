@@ -39,7 +39,7 @@ export function QuickCaptureBar() {
             autoFocus
           />
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-            <Button variant="primary" onClick={handleSubmit} style={{ flex: 1 }}>
+            <Button variant="primary" onClick={handleSubmit} style={{ flex: 1 }} loading={createTask.isPending}>
               <Plus size={16} /> Add Task
             </Button>
             <Button variant="ghost" onClick={closeCapture}>

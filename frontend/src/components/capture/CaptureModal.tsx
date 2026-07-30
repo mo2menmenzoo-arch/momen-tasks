@@ -61,7 +61,7 @@ export function CaptureModal() {
           </div>
         )}
 
-        <Button variant="primary" onClick={handleSubmit} style={{ width: '100%' }}>Create Task</Button>
+        <Button variant="primary" onClick={handleSubmit} style={{ width: '100%' }} loading={createTask.isPending}>Create Task</Button>
       </div>
     </Modal>
   );

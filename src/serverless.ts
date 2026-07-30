@@ -14,10 +14,6 @@ import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
 let cachedServer: any;
 let initError: Error | null = null;
 
-process.on('unhandledRejection', (reason) => {
-  console.error('UNHANDLED REJECTION:', reason);
-});
-
 async function createServer() {
   const expressApp = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
@@ -27,7 +23,7 @@ async function createServer() {
 
   app.use(cookieParser());
   app.enableCors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: (process.env.FRONTEND_URL || '*').trim(),
     credentials: true,
   });
   app.enableVersioning({
@@ -83,5 +79,10 @@ export default async function handler(req: any, res: any) {
       }));
     }
   }
-  return cachedServer(req, res);
+  try {
+    return cachedServer(req, res);
+  } catch (e: any) {
+    console.error('cachedServer error:', e.message);
+    throw e;
+  }
 }

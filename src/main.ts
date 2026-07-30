@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
@@ -16,12 +17,15 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  const configService = app.get(ConfigService);
+  const frontendUrl = configService.get<string>('FRONTEND_URL')!;
+
   app.use(helmet({
     crossOriginEmbedderPolicy: false,
   }));
   app.use(cookieParser());
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: frontendUrl,
     credentials: true,
   });
   app.enableVersioning({

@@ -1,5 +1,12 @@
 # AGENTS.md — Momen Tasks Design System
 
+## /loop COMMAND HANDLER
+
+- `/loop <cadence> <instructions>` triggers the loop engineering agent.
+- Examples: `/loop 1d Run triage`, `/loop 2h fix CI`, `/loop 0 single cycle now`.
+- The loop agent reads LOOP.md, STATE.md, loop-constraints.md, and loop skills from `.grok/skills/`.
+- See `C:\Users\Momen\.config\opencode\agents\loop.md` for full workflow.
+
 ## What This Repo Is
 
 CSS-only design system for **Momen Tasks** — a PWA task management app. Greenfield project: no `package.json`, no build system, no tests, no linter, no formatter.

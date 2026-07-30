@@ -73,8 +73,8 @@ export function TaskDetailSheet() {
           <div className="divider" />
 
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-            <Button variant="primary" onClick={handleSave} style={{ flex: 1 }}>Save</Button>
-            <Button variant="danger" icon onClick={handleDelete}>
+            <Button variant="primary" onClick={handleSave} style={{ flex: 1 }} loading={updateTask.isPending}>Save</Button>
+            <Button variant="danger" icon onClick={handleDelete} loading={deleteTask.isPending}>
               <Trash2 size={18} />
             </Button>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { format, startOfWeek, addDays, parseISO, isToday as fnsIsToday, startOfMonth, endOfMonth, endOfWeek, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/common/Button';
 import { SegmentControl } from '@/components/common/SegmentControl';
 import { TaskCard } from '@/components/task/TaskCard';
 import { TaskDetailSheet } from '@/components/task/TaskDetailSheet';
@@ -68,15 +69,15 @@ export function Calendar() {
       {/* Month Navigation */}
       {(view === 'month' || view === 'week') && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button className="btn btn-ghost btn-icon-sm" onClick={() => view === 'month' ? setMonthOffset(m => m - 1) : setSelectedDate(d => addDays(d, -7))}>
+          <Button variant="ghost" icon size="sm" onClick={() => view === 'month' ? setMonthOffset(m => m - 1) : setSelectedDate(d => addDays(d, -7))}>
             <ChevronLeft size={20} />
-          </button>
+          </Button>
           <span className="heading-lg">
             {view === 'month' ? format(currentMonth, 'MMMM yyyy') : `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'MMM d')}`}
           </span>
-          <button className="btn btn-ghost btn-icon-sm" onClick={() => view === 'month' ? setMonthOffset(m => m + 1) : setSelectedDate(d => addDays(d, 7))}>
+          <Button variant="ghost" icon size="sm" onClick={() => view === 'month' ? setMonthOffset(m => m + 1) : setSelectedDate(d => addDays(d, 7))}>
             <ChevronRight size={20} />
-          </button>
+          </Button>
         </div>
       )}
 

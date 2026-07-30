@@ -49,9 +49,10 @@ export class PrismaService
   }
 
   async setRlsContext(userId: string) {
+    // SET LOCAL doesn't support positional parameters ($1, $2).
+    // userId is always a UUID from the verified JWT, so interpolation is safe.
     await super.$executeRawUnsafe(
-      'SET LOCAL app.current_user_id = $1',
-      userId,
+      `SET LOCAL app.current_user_id = '${userId}'`,
     );
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RealtimeService } from './realtime.service';
-import { Logger } from '@nestjs/common';
+import { Logger, Inject, forwardRef } from '@nestjs/common';
 
 @WebSocketGateway({
   namespace: '/sync',
@@ -27,7 +27,10 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   private socketUsers: Map<string, string> = new Map();
   private zoneRooms: Map<string, Set<string>> = new Map();
 
-  constructor(private readonly realtimeService: RealtimeService) {}
+  constructor(
+    @Inject(forwardRef(() => RealtimeService))
+    private readonly realtimeService: RealtimeService,
+  ) {}
 
   async handleConnection(client: Socket): Promise<void> {
     this.logger.log(`Client connected: ${client.id}`);

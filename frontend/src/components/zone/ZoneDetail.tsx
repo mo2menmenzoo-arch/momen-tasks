@@ -19,9 +19,9 @@ export function ZoneDetailComponent() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-        <button className="btn btn-ghost btn-icon-sm" onClick={() => navigate('/zones')}>
+        <Button variant="ghost" icon size="sm" onClick={() => navigate('/zones')}>
           <ArrowLeft size={20} />
-        </button>
+        </Button>
         <h1 className="heading-xl">{zone?.name || 'Zone'}</h1>
       </div>
 

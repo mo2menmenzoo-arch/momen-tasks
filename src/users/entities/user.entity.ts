@@ -3,6 +3,7 @@ import { User } from '@prisma/client';
 export class UserEntity {
   id: string;
   email: string;
+  username: string | null;
   displayName: string | null;
   avatarUrl: string | null;
   timezone: string;
@@ -10,6 +11,7 @@ export class UserEntity {
   themePreference: string;
   notificationPrefs: Record<string, unknown> | null;
   subscriptionTier: string;
+  role: string;
   emailVerified: boolean;
   authProvider: string;
   createdAt: Date;
@@ -19,6 +21,7 @@ export class UserEntity {
     return {
       id: user.id,
       email: user.email,
+      username: user.username ?? null,
       displayName: user.displayName,
       avatarUrl: user.avatarUrl,
       timezone: user.timezone,
@@ -26,6 +29,7 @@ export class UserEntity {
       themePreference: user.themePreference,
       notificationPrefs: user.notificationPrefs as Record<string, unknown> | null,
       subscriptionTier: user.subscriptionTier,
+      role: user.role,
       emailVerified: user.emailVerified,
       authProvider: user.authProvider,
       createdAt: user.createdAt,

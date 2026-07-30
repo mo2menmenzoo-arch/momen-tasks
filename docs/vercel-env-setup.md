@@ -71,8 +71,10 @@ vercel env rm DATABASE_URL production
 4. Click **Create Credentials → OAuth client ID**
 5. Select **Web application**
 6. Add authorized redirect URIs:
-   - `https://momen-tasks.vercel.app/auth/google/callback`
-   - `http://localhost:3000/api/v1/auth/google/callback` (for development)
+   - `https://YOUR_API_DOMAIN/api/v1/auth/google/callback` (production — same as `API_URL`)
+   - `http://localhost:3000/api/v1/auth/google/callback` (development)
+
+   **Important:** the callback goes to the **backend API** domain, not the frontend. The path is `/api/v1/auth/google/callback`, matching the NestJS route in `google.strategy.ts`.
 7. Copy the Client ID and Client Secret to Vercel environment variables
 
 ## Database Setup (PostgreSQL)

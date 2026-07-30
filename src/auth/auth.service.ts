@@ -12,7 +12,6 @@ import { CryptoUtil } from '../common/utils/crypto.util';
 import { AppLoggerService } from '../shared/logger/logger.service';
 import { AuthResponse, TokenSet } from './interfaces/auth-response.interface';
 import { SignupDto } from './dto/signup.dto';
-import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +38,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: signupDto.email,
+        username: signupDto.username,
         passwordHash: hashedPassword,
         displayName: signupDto.displayName || signupDto.email.split('@')[0],
         authProvider: 'EMAIL',
@@ -58,9 +58,14 @@ export class AuthService {
     return { message: 'Verification email sent. Please check your inbox.' };
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
+  async validateUser(login: string, password: string): Promise<any> {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: login },
+          { username: login },
+        ],
+      },
     });
 
     if (!user) {
@@ -96,6 +101,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
+      username: user.username ?? null,
       displayName: user.displayName,
       avatarUrl: user.avatarUrl,
       emailVerified: user.emailVerified,
@@ -103,39 +109,12 @@ export class AuthService {
       timezone: user.timezone,
       themePreference: user.themePreference,
       subscriptionTier: user.subscriptionTier,
+      role: user.role,
       energyHours: user.energyHours,
       notificationPrefs: user.notificationPrefs,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
-  }
-
-  async login(loginDto: LoginDto): Promise<AuthResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: loginDto.email },
-    });
-
-    if (!user) {
-      this.logger.warn(`Login failed: user not found for ${loginDto.email}`, 'AuthService');
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    if (user.authProvider !== 'EMAIL') {
-      throw new UnauthorizedException(
-        `This account uses ${user.authProvider} authentication`,
-      );
-    }
-
-    if (!user.emailVerified) {
-      this.logger.warn(`Login failed: email not verified for ${loginDto.email}`, 'AuthService');
-      throw new UnauthorizedException(
-        'Please verify your email before logging in',
-      );
-    }
-
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
-    this.logger.log(`Login successful: ${user.id} (${user.email})`, 'AuthService');
-    return this.buildAuthResponse(user, tokens.accessToken);
   }
 
   async logout(refreshToken?: string): Promise<{ message: string }> {
@@ -145,10 +124,10 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
-  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
-    const { userId, email } = await this.tokenService.verifyRefreshToken(refreshToken);
-    const tokens = await this.tokenService.rotateRefreshToken(refreshToken, userId, email);
-    return { accessToken: tokens.accessToken };
+  async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const { userId } = await this.tokenService.verifyRefreshToken(refreshToken);
+    const tokens = await this.tokenService.rotateRefreshToken(refreshToken, userId);
+    return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken };
   }
 
   async revokeAllSessions(userId: string): Promise<{ message: string }> {
@@ -200,7 +179,7 @@ export class AuthService {
       });
     }
 
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const tokens = await this.tokenService.issueTokens(user.id);
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -323,7 +302,7 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const tokens = await this.tokenService.issueTokens(user.id);
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -352,7 +331,7 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.tokenService.issueTokens(user.id, user.email);
+    const tokens = await this.tokenService.issueTokens(user.id);
     return this.buildAuthResponse(user, tokens.accessToken);
   }
 
@@ -468,6 +447,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        username: user.username ?? null,
         displayName: user.displayName,
         avatarUrl: user.avatarUrl,
         emailVerified: user.emailVerified,
@@ -475,6 +455,7 @@ export class AuthService {
         timezone: user.timezone,
         themePreference: user.themePreference,
         subscriptionTier: user.subscriptionTier,
+        role: user.role,
         energyHours: user.energyHours,
         notificationPrefs: user.notificationPrefs,
         createdAt: user.createdAt,

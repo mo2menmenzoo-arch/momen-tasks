@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { RealtimeGateway } from './realtime.gateway';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class RealtimeService {
   constructor(
+    @Inject(forwardRef(() => RealtimeGateway))
     private readonly realtimeGateway: RealtimeGateway,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,

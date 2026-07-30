@@ -37,6 +37,38 @@
   transform: none;
 }
 
+.btn-loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  position: relative;
+}
+
+.btn-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin: -0.5em 0 0 -0.5em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-spinner {
+    animation: none;
+    border-color: currentColor;
+  }
+}
+
+.btn-text-loading {
+  visibility: hidden;
+}
+
 /* Primary */
 .btn-primary {
   background: var(--accent-primary);

@@ -1,5 +1,6 @@
 import { Timer, MoreHorizontal, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { Button } from '@/components/common/Button';
 import { PriorityDot } from './PriorityDot';
 import { formatDueDate } from '@/lib/dates';
 import { useUiStore } from '@/stores/ui.store';
@@ -50,12 +51,12 @@ export function TaskCard({ task, showZone, zoneName }: TaskCardProps) {
         </div>
       </div>
       <div className="task-card-actions">
-        <button className="btn btn-ghost btn-icon-sm" onClick={e => { e.stopPropagation(); }}>
+        <Button variant="ghost" icon size="sm" onClick={e => { e.stopPropagation(); }}>
           <Timer size={16} />
-        </button>
-        <button className="btn btn-ghost btn-icon-sm" onClick={e => { e.stopPropagation(); openTaskDetail(task.id); }}>
+        </Button>
+        <Button variant="ghost" icon size="sm" onClick={e => { e.stopPropagation(); openTaskDetail(task.id); }}>
           <MoreHorizontal size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );

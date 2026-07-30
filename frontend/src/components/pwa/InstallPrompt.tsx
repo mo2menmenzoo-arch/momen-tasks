@@ -11,6 +11,7 @@ interface DeferredPrompt extends Event {
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<DeferredPrompt | null>(null);
   const [show, setShow] = useState(false);
+  const [installing, setInstalling] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -24,10 +25,15 @@ export function InstallPrompt() {
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setShow(false);
-    setDeferredPrompt(null);
+    setInstalling(true);
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') setShow(false);
+      setDeferredPrompt(null);
+    } finally {
+      setInstalling(false);
+    }
   };
 
   if (window.matchMedia('(display-mode: standalone)').matches) return null;
@@ -38,7 +44,7 @@ export function InstallPrompt() {
         <Download size={48} style={{ color: 'var(--accent-primary)' }} />
         <h2 className="heading-lg">Install Momen Tasks</h2>
         <p className="body-sm text-secondary">Add to your home screen for the full experience</p>
-        <Button onClick={handleInstall} style={{ width: '100%' }}>Install App</Button>
+        <Button onClick={handleInstall} style={{ width: '100%' }} loading={installing}>Install App</Button>
       </div>
     </Modal>
   );
