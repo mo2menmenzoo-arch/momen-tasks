@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -29,6 +30,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
     private readonly logger: AppLoggerService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('signup')
@@ -97,12 +99,12 @@ export class AuthController {
         result.user.id,
       );
       this.setTokens(res, result.accessToken, tokens.refreshToken);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL')!;
       this.logger.log(`Google OAuth success, redirecting to ${frontendUrl}/auth/callback`, 'AuthController');
       return res.redirect(`${frontendUrl}/auth/callback?user=${encodeURIComponent(JSON.stringify(result.user))}`);
     } catch (error: any) {
       this.logger.error(`Google OAuth callback error: ${error.message}`, error.stack, 'AuthController');
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL')!;
       const errorMessage = encodeURIComponent(error.message || 'Google authentication failed');
       return res.redirect(`${frontendUrl}/login?error=${errorMessage}`);
     }

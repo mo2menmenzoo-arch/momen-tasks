@@ -12,6 +12,7 @@ build/
 .env
 .env.local
 .env.*.local
+.env.vercel
 
 # Secrets
 recovery-codes.txt
@@ -49,6 +50,9 @@ frontend/.vite/
 # AI agent config
 .agents/
 .opencode/
+
+# Graph build artifacts
+graphify-out/
 
 # Misc
 *.log
