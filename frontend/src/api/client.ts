@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/stores/auth.store';
+
 const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 export class ApiError extends Error {
@@ -25,6 +27,10 @@ async function refreshAccessToken(): Promise<boolean> {
     if (response.ok) {
       await response.json();
       return true;
+    }
+    // Refresh failed — tokens are expired/invalid. Clear stale auth state
+    if (response.status === 401) {
+      useAuthStore.getState().logout();
     }
     return false;
   } catch {
