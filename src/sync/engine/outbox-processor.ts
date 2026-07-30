@@ -9,23 +9,24 @@ export class OutboxProcessor {
   async processOutbox(
     userId: string,
     changes: SyncChangeDto[],
-  ): Promise<{ processed: number; conflicts: any[] }> {
+  ): Promise<{ processed: number; conflicts: Array<{ entityType: string; entityId: string; error: string }> }> {
     let processed = 0;
-    const conflicts: any[] = [];
+    const conflicts: Array<{ entityType: string; entityId: string; error: string }> = [];
 
     for (const change of changes) {
       try {
         if (change.operation === "create") {
           await this.prisma.task.create({
             data: {
-              title: (change.data as any)?.title || "Untitled",
+              title: String(change.data?.title ?? "Untitled"),
               ownerId: userId,
             },
           });
         } else if (change.operation === "update") {
           await this.prisma.task.update({
             where: { id: change.entityId },
-            data: change.data as any,
+            // sync-data: generic entity data, Prisma accepts via structural typing
+            data: change.data as Record<string, unknown>,
           });
         } else if (change.operation === "delete") {
           await this.prisma.task.update({
@@ -34,11 +35,11 @@ export class OutboxProcessor {
           });
         }
         processed++;
-      } catch (error: any) {
+      } catch (error: unknown) {
         conflicts.push({
           entityType: change.entityType,
           entityId: change.entityId,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }

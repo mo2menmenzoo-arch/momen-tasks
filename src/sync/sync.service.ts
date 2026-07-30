@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { ConflictResolver } from "./engine/conflict-resolver";
 import { CursorManager } from "./engine/cursor-manager";
@@ -47,14 +48,16 @@ export class SyncService {
 
           await this.prisma.task.update({
             where: { id: change.entityId },
-            data: merged as any,
+            // sync-data: generic merged entity data passed to Prisma at boundary
+            data: merged as unknown as Prisma.TaskUpdateInput,
           });
         } else if (change.operation === "create") {
           await this.prisma.task.create({
+            // sync-data: create from generic change data passed to Prisma at boundary
             data: {
               ...change.data,
               ownerId: userId,
-            } as any,
+            } as unknown as Prisma.TaskCreateInput,
           });
         } else if (change.operation === "delete") {
           await this.prisma.task.update({
