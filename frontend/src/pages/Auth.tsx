@@ -180,9 +180,9 @@ export function Auth() {
         </div>
         {!showMagicLink ? (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-            {isSignUp && <Input label="Name" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" required />}
-            <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
-            <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" required />
+            {isSignUp && <Input label="Name" autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" required />}
+            <Input label="Email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+            <Input label="Password" type="password" autoComplete={isSignUp ? 'new-password' : 'current-password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" required />
             <Button type="submit" style={{ width: '100%' }} loading={login.isPending || signup.isPending}>{isSignUp ? 'Sign Up' : 'Log In'}</Button>
             <div className="divider" />
             <Button type="button" variant="secondary" style={{ width: '100%' }} onClick={() => setShowMagicLink(true)}><Mail size={16} /> Send Magic Link</Button>
@@ -194,7 +194,7 @@ export function Auth() {
           </form>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-            <Input label="Email" type="email" value={magicLinkEmail} onChange={e => setMagicLinkEmail(e.target.value)} placeholder="you@example.com" />
+            <Input label="Email" type="email" autoComplete="email" value={magicLinkEmail} onChange={e => setMagicLinkEmail(e.target.value)} placeholder="you@example.com" />
             <Button onClick={handleMagicLink} style={{ width: '100%' }} loading={magicLink.isPending}>Send Magic Link</Button>
             <Button variant="ghost" onClick={() => setShowMagicLink(false)} style={{ width: '100%' }}>Back to login</Button>
           </div>
