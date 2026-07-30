@@ -14,7 +14,7 @@ import { Logger, Inject, forwardRef } from '@nestjs/common';
 @WebSocketGateway({
   namespace: '/sync',
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (process.env.FRONTEND_URL || 'http://localhost:5173').trimEnd(),
     credentials: true,
   },
 })

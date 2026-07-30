@@ -18,7 +18,7 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const frontendUrl = configService.get<string>('FRONTEND_URL')!;
+  const frontendUrl = configService.get<string>('FRONTEND_URL')!.trimEnd();
 
   app.use(helmet({
     crossOriginEmbedderPolicy: false,
