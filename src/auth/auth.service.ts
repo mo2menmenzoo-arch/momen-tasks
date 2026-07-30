@@ -390,7 +390,7 @@ export class AuthService {
         email: payload.email,
         name: payload.name,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException("Invalid Apple identity token");
     }
@@ -465,9 +465,13 @@ export class AuthService {
           },
         },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg =
+        error instanceof Error && 'response' in error
+          ? String((error as { response?: { data?: unknown } }).response?.data ?? error.message)
+          : String(error);
       this.logger.error(
-        `Failed to send email to ${to}: ${error.response?.data || error.message}`,
+        `Failed to send email to ${to}: ${msg}`,
         undefined,
         "AuthService",
       );

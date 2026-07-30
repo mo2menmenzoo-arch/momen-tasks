@@ -118,15 +118,15 @@ export class AuthController {
       return res.redirect(
         `${frontendUrl}/auth/callback?user=${encodeURIComponent(JSON.stringify(result.user))}`,
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
-        `Google OAuth callback error: ${error.message}`,
-        error.stack,
+        `Google OAuth callback error: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
         "AuthController",
       );
       const frontendUrl = this.configService.get<string>("FRONTEND_URL")!;
       const errorMessage = encodeURIComponent(
-        error.message || "Google authentication failed",
+        error instanceof Error ? error.message : "Google authentication failed",
       );
       return res.redirect(`${frontendUrl}/login?error=${errorMessage}`);
     }
