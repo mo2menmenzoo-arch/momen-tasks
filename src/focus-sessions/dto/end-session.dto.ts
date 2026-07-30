@@ -1,4 +1,4 @@
-import { IsInt, Min, IsOptional, IsBoolean } from 'class-validator';
+import { IsInt, Min, IsOptional, IsBoolean } from "class-validator";
 
 export class EndSessionDto {
   @IsOptional()

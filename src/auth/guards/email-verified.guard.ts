@@ -3,8 +3,8 @@ import {
   ExecutionContext,
   Injectable,
   ForbiddenException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class EmailVerifiedGuard implements CanActivate {
@@ -25,7 +25,7 @@ export class EmailVerifiedGuard implements CanActivate {
 
     if (!dbUser?.emailVerified) {
       throw new ForbiddenException(
-        'Email verification required. Please verify your email to access this resource.',
+        "Email verification required. Please verify your email to access this resource.",
       );
     }
 

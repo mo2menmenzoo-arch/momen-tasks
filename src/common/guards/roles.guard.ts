@@ -3,10 +3,10 @@ import {
   ExecutionContext,
   Injectable,
   ForbiddenException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { ZoneRole } from '@prisma/client';
-import { ROLES_KEY } from '../decorators/roles.decorator';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { ZoneRole } from "@prisma/client";
+import { ROLES_KEY } from "../decorators/roles.decorator";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -27,13 +27,13 @@ export class RolesGuard implements CanActivate {
 
     if (!user?.zoneRole) {
       throw new ForbiddenException(
-        `Requires role: ${requiredRoles.join(', ')}`,
+        `Requires role: ${requiredRoles.join(", ")}`,
       );
     }
 
     if (!requiredRoles.includes(user.zoneRole)) {
       throw new ForbiddenException(
-        `Requires one of: ${requiredRoles.join(', ')}. You have: ${user.zoneRole}`,
+        `Requires one of: ${requiredRoles.join(", ")}. You have: ${user.zoneRole}`,
       );
     }
 

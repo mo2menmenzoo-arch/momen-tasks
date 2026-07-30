@@ -1,9 +1,9 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Logger } from '@nestjs/common';
+import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Logger } from "@nestjs/common";
 
-@Processor('export')
+@Processor("export")
 export class ExportProcessor extends WorkerHost {
   private readonly logger = new Logger(ExportProcessor.name);
 
@@ -13,7 +13,7 @@ export class ExportProcessor extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     switch (job.name) {
-      case 'generate-export':
+      case "generate-export":
         return this.handleGenerateExport(job);
       default:
         throw new Error(`Unknown job name: ${job.name}`);
@@ -21,7 +21,7 @@ export class ExportProcessor extends WorkerHost {
   }
 
   private async handleGenerateExport(
-    job: Job<{ userId: string; exportId: string; format: 'json' | 'csv' }>,
+    job: Job<{ userId: string; exportId: string; format: "json" | "csv" }>,
   ) {
     this.logger.log(`Generating data export for user ${job.data.userId}`);
 

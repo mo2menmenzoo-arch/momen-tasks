@@ -4,7 +4,7 @@ import {
   IsBoolean,
   IsObject,
   IsArray,
-} from 'class-validator';
+} from "class-validator";
 
 export class CreateTemplateDto {
   @IsString()

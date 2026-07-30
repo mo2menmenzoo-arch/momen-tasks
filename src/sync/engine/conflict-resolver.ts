@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { SyncChangeDto } from '../dto/push-changes.dto';
+import { Injectable } from "@nestjs/common";
+import { SyncChangeDto } from "../dto/push-changes.dto";
 
 export interface ConflictResult {
   entityType: string;
@@ -25,7 +25,7 @@ export class ConflictResolver {
       const { field, oldValue, newValue, timestamp } = fieldChange;
 
       const serverValue = serverData[field];
-      const serverUpdatedAt = serverData['updatedAt'] as Date;
+      const serverUpdatedAt = serverData["updatedAt"] as Date;
 
       if (serverValue === newValue) {
         continue;
@@ -47,12 +47,15 @@ export class ConflictResolver {
       }
     }
 
-    if (clientChange.operation === 'delete') {
-      const serverUpdatedAt = serverData['updatedAt'] as Date;
-      if (serverUpdatedAt && new Date(clientChange.timestamp) < new Date(serverUpdatedAt)) {
-        merged['_deleted'] = false;
+    if (clientChange.operation === "delete") {
+      const serverUpdatedAt = serverData["updatedAt"] as Date;
+      if (
+        serverUpdatedAt &&
+        new Date(clientChange.timestamp) < new Date(serverUpdatedAt)
+      ) {
+        merged["_deleted"] = false;
       } else {
-        merged['_deleted'] = true;
+        merged["_deleted"] = true;
       }
       hasConflict = true;
     }
@@ -61,7 +64,7 @@ export class ConflictResolver {
       const conflict: ConflictResult = {
         entityType: clientChange.entityType,
         entityId: clientChange.entityId,
-        conflictType: 'field_merge',
+        conflictType: "field_merge",
         serverData,
         clientData,
         mergedData: merged,

@@ -1,6 +1,11 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { ConfigService } from '@nestjs/config';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class PrismaService
@@ -14,7 +19,7 @@ export class PrismaService
     super({
       datasources: {
         db: {
-          url: configService.get<string>('DATABASE_CONFIG.url'),
+          url: configService.get<string>("DATABASE_CONFIG.url"),
         },
       },
     });
@@ -24,7 +29,7 @@ export class PrismaService
     try {
       await super.$connect();
       this.connected = true;
-      this.logger.log('Database connected');
+      this.logger.log("Database connected");
     } catch (error: any) {
       this.logger.error(`Database connection failed: ${error.message}`);
     }

@@ -1,10 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
-import { CryptoUtil } from '../common/utils/crypto.util';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { TokenSet } from './interfaces/auth-response.interface';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { PrismaService } from "../prisma/prisma.service";
+import { CryptoUtil } from "../common/utils/crypto.util";
+import { JwtPayload } from "./interfaces/jwt-payload.interface";
+import { TokenSet } from "./interfaces/auth-response.interface";
 
 @Injectable()
 export class TokenService {
@@ -14,18 +14,23 @@ export class TokenService {
     private readonly prisma: PrismaService,
   ) {}
 
-  generateAccessToken(userId: string, email: string, username?: string | null, role?: string): string {
+  generateAccessToken(
+    userId: string,
+    email: string,
+    username?: string | null,
+    role?: string,
+  ): string {
     const payload: JwtPayload = {
       sub: userId,
       email,
       username,
-      role: role || 'USER',
-      type: 'access',
+      role: role || "USER",
+      type: "access",
     };
 
     return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_CONFIG.accessSecret'),
-      expiresIn: this.configService.get<string>('JWT_CONFIG.accessExpiresIn'),
+      secret: this.configService.get<string>("JWT_CONFIG.accessSecret"),
+      expiresIn: this.configService.get<string>("JWT_CONFIG.accessExpiresIn"),
     });
   }
 
@@ -54,9 +59,14 @@ export class TokenService {
       select: { id: true, email: true, username: true, role: true },
     });
 
-    if (!user) throw new UnauthorizedException('User not found');
+    if (!user) throw new UnauthorizedException("User not found");
 
-    const accessToken = this.generateAccessToken(user.id, user.email, user.username, user.role);
+    const accessToken = this.generateAccessToken(
+      user.id,
+      user.email,
+      user.username,
+      user.role,
+    );
     const refreshToken = await this.generateRefreshToken(userId);
     return { accessToken, refreshToken };
   }
@@ -72,15 +82,15 @@ export class TokenService {
         tokenHash,
         userId,
       },
-      orderBy: { issuedAt: 'desc' },
+      orderBy: { issuedAt: "desc" },
     });
 
     if (!existingToken) {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException("Invalid refresh token");
     }
 
     if (existingToken.expiresAt < new Date()) {
-      throw new UnauthorizedException('Refresh token expired');
+      throw new UnauthorizedException("Refresh token expired");
     }
 
     if (existingToken.revokedAt) {
@@ -88,7 +98,7 @@ export class TokenService {
         where: { familyId: existingToken.familyId },
         data: { revokedAt: new Date() },
       });
-      throw new UnauthorizedException('Refresh token reuse detected');
+      throw new UnauthorizedException("Refresh token reuse detected");
     }
 
     await this.prisma.refreshToken.update({
@@ -101,7 +111,7 @@ export class TokenService {
       select: { id: true, email: true, username: true, role: true },
     });
 
-    if (!user) throw new UnauthorizedException('User not found');
+    if (!user) throw new UnauthorizedException("User not found");
 
     const newRefreshToken = await this.generateRefreshToken(userId);
     await this.prisma.refreshToken.update({
@@ -112,7 +122,12 @@ export class TokenService {
       },
     });
 
-    const accessToken = this.generateAccessToken(user.id, user.email, user.username, user.role);
+    const accessToken = this.generateAccessToken(
+      user.id,
+      user.email,
+      user.username,
+      user.role,
+    );
     return { accessToken, refreshToken: newRefreshToken };
   }
 
@@ -142,7 +157,7 @@ export class TokenService {
     });
 
     if (!token || token.expiresAt < new Date() || token.revokedAt) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new UnauthorizedException("Invalid or expired refresh token");
     }
 
     return { userId: token.userId, email: token.user.email };

@@ -1,4 +1,4 @@
-import { Notification } from '@prisma/client';
+import { Notification } from "@prisma/client";
 
 export class NotificationEntity {
   id: string;

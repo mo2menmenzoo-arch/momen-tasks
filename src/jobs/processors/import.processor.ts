@@ -1,9 +1,9 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Logger } from '@nestjs/common';
+import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Logger } from "@nestjs/common";
 
-@Processor('import')
+@Processor("import")
 export class ImportProcessor extends WorkerHost {
   private readonly logger = new Logger(ImportProcessor.name);
 
@@ -13,9 +13,9 @@ export class ImportProcessor extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     switch (job.name) {
-      case 'process-csv-import':
+      case "process-csv-import":
         return this.handleCsvImport(job);
-      case 'process-todoist-import':
+      case "process-todoist-import":
         return this.handleTodoistImport(job);
       default:
         throw new Error(`Unknown job name: ${job.name}`);
@@ -30,11 +30,11 @@ export class ImportProcessor extends WorkerHost {
 
       await job.updateProgress(0);
 
-      const axios = require('axios');
+      const axios = require("axios");
       const response = await axios.get(fileUrl);
       const csvData = response.data;
 
-      const lines = csvData.split('\n').filter((line: string) => line.trim());
+      const lines = csvData.split("\n").filter((line: string) => line.trim());
       const totalLines = lines.length;
 
       let imported = 0;
@@ -44,7 +44,7 @@ export class ImportProcessor extends WorkerHost {
         const batch = lines.slice(i, i + batchSize);
 
         for (const line of batch) {
-          const values = line.split(',').map((v: string) => v.trim());
+          const values = line.split(",").map((v: string) => v.trim());
           const title = columnMapping?.title
             ? values[columnMapping.title]
             : values[0];
@@ -53,10 +53,12 @@ export class ImportProcessor extends WorkerHost {
             await this.prisma.task.create({
               data: {
                 title,
-                notes: columnMapping?.notes ? values[columnMapping.notes] : undefined,
+                notes: columnMapping?.notes
+                  ? values[columnMapping.notes]
+                  : undefined,
                 ownerId: userId,
                 zoneId,
-                source: 'IMPORT',
+                source: "IMPORT",
               },
             });
             imported++;
@@ -88,7 +90,7 @@ export class ImportProcessor extends WorkerHost {
 
       await job.updateProgress(0);
 
-      const axios = require('axios');
+      const axios = require("axios");
       const response = await axios.get(fileUrl);
       const todoistData = response.data;
 
@@ -99,20 +101,20 @@ export class ImportProcessor extends WorkerHost {
         for (let i = 0; i < tasks.length; i++) {
           const task = tasks[i];
           const priorityMap: Record<number, string> = {
-            1: 'LOW',
-            2: 'MEDIUM',
-            3: 'HIGH',
-            4: 'CRITICAL',
+            1: "LOW",
+            2: "MEDIUM",
+            3: "HIGH",
+            4: "CRITICAL",
           };
 
           await this.prisma.task.create({
             data: {
               title: task.content || task.title,
               notes: task.description,
-              priority: (priorityMap[task.priority] || 'MEDIUM') as any,
+              priority: (priorityMap[task.priority] || "MEDIUM") as any,
               ownerId: userId,
               zoneId,
-              source: 'IMPORT',
+              source: "IMPORT",
               tags: task.labels || [],
             },
           });

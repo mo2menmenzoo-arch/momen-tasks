@@ -33,7 +33,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }, [loading, minDuration]);
 
     const loadingLabel = typeof children === 'string' ? children : undefined;
-    const loadingAriaLabel = showLoading ? (loadingLabel || 'Loading') : undefined;
 
     return (
       <button
@@ -51,10 +50,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           className
         )}
         disabled={disabled || showLoading}
+        aria-busy={showLoading || undefined}
         {...props}
-        aria-label={loadingAriaLabel}
       >
-        {showLoading && <span className="btn-spinner" role="status" />}
+        {showLoading && <span className="btn-spinner" role="status" aria-label={loadingLabel ? `${loadingLabel}, loading` : 'Loading'} />}
         <span className={showLoading ? 'btn-text-loading' : undefined}>{children}</span>
       </button>
     );

@@ -171,7 +171,7 @@ export function Auth() {
   };
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', position: 'relative' }}>
+    <main style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', position: 'relative' }}>
       <GeometricPattern subtle />
       <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
@@ -185,11 +185,11 @@ export function Auth() {
             <Input label="Password" type="password" autoComplete={isSignUp ? 'new-password' : 'current-password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" required />
             <Button type="submit" style={{ width: '100%' }} loading={login.isPending || signup.isPending}>{isSignUp ? 'Sign Up' : 'Log In'}</Button>
             <div className="divider" />
-            <Button type="button" variant="secondary" style={{ width: '100%' }} onClick={() => setShowMagicLink(true)}><Mail size={16} /> Send Magic Link</Button>
+            <Button type="button" variant="secondary" style={{ width: '100%' }} onClick={() => setShowMagicLink(true)}><Mail size={16} aria-hidden="true" /> Send Magic Link</Button>
             <Button type="button" variant="ghost" style={{ width: '100%' }} onClick={handleGoogleLogin} loading={googleLoading}>Continue with Google</Button>
             <p className="body-sm text-secondary" style={{ textAlign: 'center' }}>
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-              <button type="button" style={{ color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'var(--weight-medium)' }} onClick={() => setIsSignUp(!isSignUp)}>{isSignUp ? 'Log In' : 'Sign Up'}</button>
+              <button type="button" style={{ color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'var(--weight-medium)', padding: 'var(--space-1) var(--space-2)', minHeight: '44px' }} onClick={() => setIsSignUp(!isSignUp)}>{isSignUp ? 'Log In' : 'Sign Up'}</button>
             </p>
           </form>
         ) : (
@@ -200,6 +200,6 @@ export function Auth() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

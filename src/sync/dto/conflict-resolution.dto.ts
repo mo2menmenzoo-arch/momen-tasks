@@ -1,4 +1,4 @@
-import { IsString, IsObject, IsDateString, IsEnum } from 'class-validator';
+import { IsString, IsObject, IsDateString, IsEnum } from "class-validator";
 
 export class ConflictResolutionDto {
   @IsString()
@@ -7,7 +7,7 @@ export class ConflictResolutionDto {
   @IsString()
   entityId: string;
 
-  @IsEnum(['field_merge', 'last_write_wins', 'delete_wins'])
+  @IsEnum(["field_merge", "last_write_wins", "delete_wins"])
   conflictType: string;
 
   @IsObject()

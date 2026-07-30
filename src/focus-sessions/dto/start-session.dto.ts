@@ -1,4 +1,11 @@
-import { IsUUID, IsInt, Min, IsOptional, IsString, IsBoolean } from 'class-validator';
+import {
+  IsUUID,
+  IsInt,
+  Min,
+  IsOptional,
+  IsString,
+  IsBoolean,
+} from "class-validator";
 
 export class StartSessionDto {
   @IsUUID()

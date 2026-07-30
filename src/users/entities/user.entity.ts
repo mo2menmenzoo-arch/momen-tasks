@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User } from "@prisma/client";
 
 export class UserEntity {
   id: string;
@@ -27,7 +27,10 @@ export class UserEntity {
       timezone: user.timezone,
       energyHours: user.energyHours as Record<string, unknown> | null,
       themePreference: user.themePreference,
-      notificationPrefs: user.notificationPrefs as Record<string, unknown> | null,
+      notificationPrefs: user.notificationPrefs as Record<
+        string,
+        unknown
+      > | null,
       subscriptionTier: user.subscriptionTier,
       role: user.role,
       emailVerified: user.emailVerified,

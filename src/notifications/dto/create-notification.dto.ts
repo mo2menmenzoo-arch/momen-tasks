@@ -5,8 +5,8 @@ import {
   IsDateString,
   IsObject,
   IsUUID,
-} from 'class-validator';
-import { NotificationType, NotificationStatus } from '@prisma/client';
+} from "class-validator";
+import { NotificationType, NotificationStatus } from "@prisma/client";
 
 export class CreateNotificationDto {
   @IsUUID()

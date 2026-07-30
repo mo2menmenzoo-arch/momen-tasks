@@ -1,9 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsObject,
-  IsUUID,
-} from 'class-validator';
+import { IsString, IsOptional, IsObject, IsUUID } from "class-validator";
 
 export class CsvImportDto {
   @IsString()

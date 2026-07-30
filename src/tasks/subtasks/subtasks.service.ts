@@ -2,10 +2,10 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateSubtaskDto } from './dto/create-subtask.dto';
-import { TaskEntity } from '../entities/task.entity';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CreateSubtaskDto } from "./dto/create-subtask.dto";
+import { TaskEntity } from "../entities/task.entity";
 
 @Injectable()
 export class SubtasksService {
@@ -21,7 +21,7 @@ export class SubtasksService {
     });
 
     if (!parentTask) {
-      throw new NotFoundException('Parent task not found');
+      throw new NotFoundException("Parent task not found");
     }
 
     const subtasks = await this.prisma.task.findMany({
@@ -30,7 +30,7 @@ export class SubtasksService {
         ownerId: userId,
         deletedAt: null,
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
     });
 
     return subtasks.map(TaskEntity.fromTask);
@@ -50,13 +50,13 @@ export class SubtasksService {
     });
 
     if (!parentTask) {
-      throw new NotFoundException('Parent task not found');
+      throw new NotFoundException("Parent task not found");
     }
 
     const depth = await this.getTaskDepth(userId, taskId);
     if (depth >= 5) {
       throw new BadRequestException(
-        'Cannot create subtask: maximum nesting depth of 5 levels reached',
+        "Cannot create subtask: maximum nesting depth of 5 levels reached",
       );
     }
 
@@ -72,7 +72,11 @@ export class SubtasksService {
     return TaskEntity.fromTask(subtask);
   }
 
-  async remove(userId: string, taskId: string, subtaskId: string): Promise<{ message: string }> {
+  async remove(
+    userId: string,
+    taskId: string,
+    subtaskId: string,
+  ): Promise<{ message: string }> {
     const parentTask = await this.prisma.task.findFirst({
       where: {
         id: taskId,
@@ -82,7 +86,7 @@ export class SubtasksService {
     });
 
     if (!parentTask) {
-      throw new NotFoundException('Parent task not found');
+      throw new NotFoundException("Parent task not found");
     }
 
     const subtask = await this.prisma.task.findFirst({
@@ -95,7 +99,7 @@ export class SubtasksService {
     });
 
     if (!subtask) {
-      throw new NotFoundException('Subtask not found');
+      throw new NotFoundException("Subtask not found");
     }
 
     await this.prisma.task.update({
@@ -103,13 +107,11 @@ export class SubtasksService {
       data: { parentTaskId: null },
     });
 
-    return { message: 'Subtask relationship removed successfully' };
+    return { message: "Subtask relationship removed successfully" };
   }
 
   private async getTaskDepth(userId: string, taskId: string): Promise<number> {
-    const result = await this.prisma.$queryRaw<
-      Array<{ depth: number }>
-    >`
+    const result = await this.prisma.$queryRaw<Array<{ depth: number }>>`
       WITH RECURSIVE task_depth AS (
         SELECT id, parent_task_id, 0 as depth
         FROM "Task"

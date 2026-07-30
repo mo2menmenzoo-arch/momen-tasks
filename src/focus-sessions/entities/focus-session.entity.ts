@@ -1,4 +1,4 @@
-import { FocusSession } from '@prisma/client';
+import { FocusSession } from "@prisma/client";
 
 export class FocusSessionEntity {
   id: string;

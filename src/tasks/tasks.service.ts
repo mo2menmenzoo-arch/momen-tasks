@@ -2,13 +2,13 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { TaskQueryDto } from './dto/task-query.dto';
-import { TaskEntity } from './entities/task.entity';
-import { CryptoUtil } from '../common/utils/crypto.util';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateTaskDto } from "./dto/create-task.dto";
+import { UpdateTaskDto } from "./dto/update-task.dto";
+import { TaskQueryDto } from "./dto/task-query.dto";
+import { TaskEntity } from "./entities/task.entity";
+import { CryptoUtil } from "../common/utils/crypto.util";
 
 @Injectable()
 export class TasksService {
@@ -46,20 +46,20 @@ export class TasksService {
 
     if (query.search) {
       where.OR = [
-        { title: { contains: query.search, mode: 'insensitive' } },
-        { notes: { contains: query.search, mode: 'insensitive' as const } },
+        { title: { contains: query.search, mode: "insensitive" } },
+        { notes: { contains: query.search, mode: "insensitive" as const } },
       ];
     }
 
     if (!query.includeCompleted) {
-      where.NOT = { status: 'COMPLETED' };
+      where.NOT = { status: "COMPLETED" };
     }
 
     const orderBy: any = {};
     if (query.sortBy) {
-      orderBy[query.sortBy] = query.sortOrder || 'desc';
+      orderBy[query.sortBy] = query.sortOrder || "desc";
     } else {
-      orderBy.createdAt = 'desc';
+      orderBy.createdAt = "desc";
     }
 
     const tasks = await this.prisma.task.findMany({
@@ -80,13 +80,16 @@ export class TasksService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     return TaskEntity.fromTask(task);
   }
 
-  async create(userId: string, createTaskDto: CreateTaskDto): Promise<TaskEntity> {
+  async create(
+    userId: string,
+    createTaskDto: CreateTaskDto,
+  ): Promise<TaskEntity> {
     const task = await this.prisma.task.create({
       data: {
         title: createTaskDto.title,
@@ -128,29 +131,61 @@ export class TasksService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     const updatedTask = await this.prisma.task.update({
       where: { id: taskId },
       data: {
-        ...(updateTaskDto.title !== undefined && { title: updateTaskDto.title }),
-        ...(updateTaskDto.notes !== undefined && { notes: updateTaskDto.notes }),
-        ...(updateTaskDto.priority !== undefined && { priority: updateTaskDto.priority }),
-        ...(updateTaskDto.dueDate !== undefined && { dueDate: updateTaskDto.dueDate }),
-        ...(updateTaskDto.dueTime !== undefined && { dueTime: updateTaskDto.dueTime }),
-        ...(updateTaskDto.isAllDay !== undefined && { isAllDay: updateTaskDto.isAllDay }),
-        ...(updateTaskDto.recurrenceRule !== undefined && { recurrenceRule: updateTaskDto.recurrenceRule }),
-        ...(updateTaskDto.estimatedEffortMinutes !== undefined && { estimatedEffortMinutes: updateTaskDto.estimatedEffortMinutes }),
-        ...(updateTaskDto.status !== undefined && { status: updateTaskDto.status }),
-        ...(updateTaskDto.completedAt !== undefined && { completedAt: updateTaskDto.completedAt }),
-        ...(updateTaskDto.assignedToId !== undefined && { assignedToId: updateTaskDto.assignedToId }),
+        ...(updateTaskDto.title !== undefined && {
+          title: updateTaskDto.title,
+        }),
+        ...(updateTaskDto.notes !== undefined && {
+          notes: updateTaskDto.notes,
+        }),
+        ...(updateTaskDto.priority !== undefined && {
+          priority: updateTaskDto.priority,
+        }),
+        ...(updateTaskDto.dueDate !== undefined && {
+          dueDate: updateTaskDto.dueDate,
+        }),
+        ...(updateTaskDto.dueTime !== undefined && {
+          dueTime: updateTaskDto.dueTime,
+        }),
+        ...(updateTaskDto.isAllDay !== undefined && {
+          isAllDay: updateTaskDto.isAllDay,
+        }),
+        ...(updateTaskDto.recurrenceRule !== undefined && {
+          recurrenceRule: updateTaskDto.recurrenceRule,
+        }),
+        ...(updateTaskDto.estimatedEffortMinutes !== undefined && {
+          estimatedEffortMinutes: updateTaskDto.estimatedEffortMinutes,
+        }),
+        ...(updateTaskDto.status !== undefined && {
+          status: updateTaskDto.status,
+        }),
+        ...(updateTaskDto.completedAt !== undefined && {
+          completedAt: updateTaskDto.completedAt,
+        }),
+        ...(updateTaskDto.assignedToId !== undefined && {
+          assignedToId: updateTaskDto.assignedToId,
+        }),
         ...(updateTaskDto.tags !== undefined && { tags: updateTaskDto.tags }),
-        ...(updateTaskDto.blockedBy !== undefined && { blockedBy: updateTaskDto.blockedBy }),
-        ...(updateTaskDto.blocks !== undefined && { blocks: updateTaskDto.blocks }),
-        ...(updateTaskDto.locationTrigger !== undefined && { locationTrigger: updateTaskDto.locationTrigger as any }),
-        ...(updateTaskDto.attachments !== undefined && { attachments: updateTaskDto.attachments as any }),
-        ...(updateTaskDto.source !== undefined && { source: updateTaskDto.source }),
+        ...(updateTaskDto.blockedBy !== undefined && {
+          blockedBy: updateTaskDto.blockedBy,
+        }),
+        ...(updateTaskDto.blocks !== undefined && {
+          blocks: updateTaskDto.blocks,
+        }),
+        ...(updateTaskDto.locationTrigger !== undefined && {
+          locationTrigger: updateTaskDto.locationTrigger as any,
+        }),
+        ...(updateTaskDto.attachments !== undefined && {
+          attachments: updateTaskDto.attachments as any,
+        }),
+        ...(updateTaskDto.source !== undefined && {
+          source: updateTaskDto.source,
+        }),
       },
     });
 
@@ -167,7 +202,7 @@ export class TasksService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     await this.prisma.task.update({
@@ -175,7 +210,7 @@ export class TasksService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Task deleted successfully' };
+    return { message: "Task deleted successfully" };
   }
 
   async getDescendants(userId: string, taskId: string): Promise<TaskEntity[]> {
@@ -247,9 +282,7 @@ export class TasksService {
   }
 
   async getTaskDepth(userId: string, taskId: string): Promise<number> {
-    const result = await this.prisma.$queryRaw<
-      Array<{ depth: number }>
-    >`
+    const result = await this.prisma.$queryRaw<Array<{ depth: number }>>`
       WITH RECURSIVE task_depth AS (
         SELECT id, parent_task_id, 0 as depth
         FROM "Task"
@@ -266,10 +299,11 @@ export class TasksService {
     return result[0]?.depth || 0;
   }
 
-  async getTransitiveBlockers(userId: string, taskId: string): Promise<string[]> {
-    const results = await this.prisma.$queryRaw<
-      Array<{ blocker_id: string }>
-    >`
+  async getTransitiveBlockers(
+    userId: string,
+    taskId: string,
+  ): Promise<string[]> {
+    const results = await this.prisma.$queryRaw<Array<{ blocker_id: string }>>`
       WITH RECURSIVE blockers AS (
         SELECT unnest(blocked_by) as blocker_id, 0 as depth
         FROM "Task"
@@ -286,10 +320,11 @@ export class TasksService {
     return results.map((r) => r.blocker_id);
   }
 
-  async getTransitiveBlocked(userId: string, taskId: string): Promise<string[]> {
-    const results = await this.prisma.$queryRaw<
-      Array<{ blocked_id: string }>
-    >`
+  async getTransitiveBlocked(
+    userId: string,
+    taskId: string,
+  ): Promise<string[]> {
+    const results = await this.prisma.$queryRaw<Array<{ blocked_id: string }>>`
       WITH RECURSIVE blocked AS (
         SELECT unnest(blocks) as blocked_id, 0 as depth
         FROM "Task"
