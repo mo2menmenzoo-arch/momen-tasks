@@ -107,7 +107,8 @@ export class AuthController {
   async googleCallback(@Req() req: Request, @Res() res: Response) {
     try {
       this.logger.log("Google OAuth callback received", "AuthController");
-      const result = await this.authService.googleCallback(req.user);
+      // google-callback: req.user set by GoogleStrategy (not JwtPayload)
+      const result = await this.authService.googleCallback(req.user as unknown as { email: string; displayName?: string | null; avatarUrl?: string | null; firstName?: string; lastName?: string; provider: string });
       const tokens = await this.tokenService.issueTokens(result.user.id);
       this.setTokens(res, result.accessToken, tokens.refreshToken);
       const frontendUrl = this.configService.get<string>("FRONTEND_URL")!;

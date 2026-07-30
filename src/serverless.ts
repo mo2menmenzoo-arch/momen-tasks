@@ -11,7 +11,7 @@ import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
 import { TimeoutInterceptor } from "./common/interceptors/timeout.interceptor";
 
-let cachedServer: any;
+let cachedServer: express.Express | undefined;
 let initError: Error | null = null;
 
 async function createServer() {
@@ -58,7 +58,10 @@ async function createServer() {
   return expressApp;
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(
+  req: express.Request,
+  res: express.Response,
+) {
   if (initError) {
     res.statusCode = 500;
     res.setHeader("Content-Type", "application/json");

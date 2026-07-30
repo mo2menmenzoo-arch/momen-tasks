@@ -10,6 +10,7 @@ import { PasswordService } from "./password.service";
 import { TokenService } from "./token.service";
 import { CryptoUtil } from "../common/utils/crypto.util";
 import { AppLoggerService } from "../shared/logger/logger.service";
+import { User } from "@prisma/client";
 import { AuthResponse, TokenSet } from "./interfaces/auth-response.interface";
 import { SignupDto } from "./dto/signup.dto";
 
@@ -97,7 +98,7 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  sanitizeUser(user: any) {
+  sanitizeUser(user: Pick<User, 'id' | 'email' | 'username' | 'displayName' | 'avatarUrl' | 'emailVerified' | 'authProvider' | 'timezone' | 'themePreference' | 'subscriptionTier' | 'role' | 'energyHours' | 'notificationPrefs' | 'createdAt' | 'updatedAt'>) {
     return {
       id: user.id,
       email: user.email,
@@ -110,8 +111,9 @@ export class AuthService {
       themePreference: user.themePreference,
       subscriptionTier: user.subscriptionTier,
       role: user.role,
-      energyHours: user.energyHours,
-      notificationPrefs: user.notificationPrefs,
+      // prisma-json: cast JsonValue to expected shape
+      energyHours: user.energyHours as Record<string, unknown> | null,
+      notificationPrefs: user.notificationPrefs as Record<string, unknown> | null,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -282,10 +284,10 @@ export class AuthService {
     return { url: "/auth/google" };
   }
 
-  async googleCallback(profile: any): Promise<AuthResponse> {
-    const email = profile.emails[0].value;
-    const displayName = profile.displayName;
-    const avatarUrl = profile.photos?.[0]?.value;
+  async googleCallback(profile: { email: string; displayName?: string | null; avatarUrl?: string | null; firstName?: string; lastName?: string; provider: string }): Promise<AuthResponse> {
+    const email = profile.email;
+    const displayName = profile.displayName ?? profile.firstName ?? null;
+    const avatarUrl = profile.avatarUrl ?? null;
 
     this.logger.log(`Google OAuth callback for: ${email}`, "AuthService");
 
@@ -380,11 +382,11 @@ export class AuthService {
       });
 
       // Verify the token
-      const payload: any = jwt.verify(identityToken, publicKey, {
+      const payload = jwt.verify(identityToken, publicKey, {
         algorithms: ["RS256"],
         issuer: "https://appleid.apple.com",
         audience: this.configService.get<string>("APPLE_CLIENT_ID"),
-      });
+      }) as { email: string; name?: string };
 
       return {
         email: payload.email,
@@ -478,7 +480,7 @@ export class AuthService {
     }
   }
 
-  private buildAuthResponse(user: any, accessToken: string): AuthResponse {
+  private buildAuthResponse(user: Pick<User, 'id' | 'email' | 'username' | 'displayName' | 'avatarUrl' | 'emailVerified' | 'authProvider' | 'timezone' | 'themePreference' | 'subscriptionTier' | 'role' | 'energyHours' | 'notificationPrefs' | 'createdAt' | 'updatedAt'>, accessToken: string): AuthResponse {
     return {
       user: {
         id: user.id,
@@ -492,8 +494,9 @@ export class AuthService {
         themePreference: user.themePreference,
         subscriptionTier: user.subscriptionTier,
         role: user.role,
-        energyHours: user.energyHours,
-        notificationPrefs: user.notificationPrefs,
+        // prisma-json: cast JsonValue to expected shape
+        energyHours: user.energyHours as Record<string, unknown> | null,
+        notificationPrefs: user.notificationPrefs as Record<string, unknown> | null,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
