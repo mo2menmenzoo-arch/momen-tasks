@@ -3,6 +3,8 @@ import {
   NestModule,
   MiddlewareConsumer,
   DynamicModule,
+  ForwardReference,
+  Type,
 } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { BullModule } from "@nestjs/bullmq";
@@ -34,8 +36,10 @@ import { RateLimitMiddleware } from "./common/middleware/rate-limit.middleware";
 const isServerless =
   process.env.VERCEL === "1" || process.env.VERCEL === "true";
 
-function getDynamicImports(): any[] {
-  const imports: any[] = [
+type ModuleImport = Type<unknown> | DynamicModule | Promise<DynamicModule> | ForwardReference;
+
+function getDynamicImports(): ModuleImport[] {
+  const imports: ModuleImport[] = [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [

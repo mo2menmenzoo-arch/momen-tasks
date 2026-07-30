@@ -2,6 +2,7 @@ import { Injectable, Inject, forwardRef } from "@nestjs/common";
 import { RealtimeGateway } from "./realtime.gateway";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import type { JwtPayload } from "../auth/interfaces/jwt-payload.interface";
 
 @Injectable()
 export class RealtimeService {
@@ -12,7 +13,7 @@ export class RealtimeService {
     private readonly configService: ConfigService,
   ) {}
 
-  async verifyToken(token: string): Promise<any> {
+  async verifyToken(token: string): Promise<JwtPayload | null> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>("JWT_ACCESS_SECRET"),
@@ -23,18 +24,18 @@ export class RealtimeService {
     }
   }
 
-  broadcastToUser(userId: string, event: string, data: any): void {
+  broadcastToUser(userId: string, event: string, data: unknown): void {
     this.realtimeGateway.sendToUser(userId, event, data);
   }
 
-  broadcastToZone(zoneId: string, event: string, data: any): void {
+  broadcastToZone(zoneId: string, event: string, data: unknown): void {
     this.realtimeGateway.sendToZone(zoneId, event, data);
   }
 
   broadcastTaskCreated(
     userId: string,
     zoneId: string | null,
-    taskData: any,
+    taskData: unknown,
   ): void {
     this.broadcastToUser(userId, "task:created", taskData);
     if (zoneId) {
@@ -45,7 +46,7 @@ export class RealtimeService {
   broadcastTaskUpdated(
     userId: string,
     zoneId: string | null,
-    changes: any,
+    changes: unknown,
     updatedBy: string,
   ): void {
     this.broadcastToUser(userId, "task:updated", { changes, updatedBy });
@@ -69,7 +70,7 @@ export class RealtimeService {
   broadcastZoneUpdated(
     userId: string,
     zoneId: string,
-    changes: any,
+    changes: unknown,
     updatedBy: string,
   ): void {
     this.broadcastToUser(userId, "zone:updated", {
@@ -115,15 +116,15 @@ export class RealtimeService {
     });
   }
 
-  broadcastFocusSessionStarted(userId: string, sessionData: any): void {
+  broadcastFocusSessionStarted(userId: string, sessionData: unknown): void {
     this.broadcastToUser(userId, "focus-session:started", sessionData);
   }
 
-  broadcastFocusSessionEnded(userId: string, sessionData: any): void {
+  broadcastFocusSessionEnded(userId: string, sessionData: unknown): void {
     this.broadcastToUser(userId, "focus-session:ended", sessionData);
   }
 
-  broadcastNotification(userId: string, notificationData: any): void {
+  broadcastNotification(userId: string, notificationData: unknown): void {
     this.broadcastToUser(userId, "notification:delivered", notificationData);
   }
 }

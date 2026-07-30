@@ -143,11 +143,11 @@ export class RealtimeGateway
     });
   }
 
-  sendToUser(userId: string, event: string, data: any): void {
+  sendToUser(userId: string, event: string, data: unknown): void {
     this.server.to(`user:${userId}`).emit(event, data);
   }
 
-  sendToZone(zoneId: string, event: string, data: any): void {
+  sendToZone(zoneId: string, event: string, data: unknown): void {
     this.server.to(`zone:${zoneId}`).emit(event, data);
   }
 }

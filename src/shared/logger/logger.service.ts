@@ -12,7 +12,7 @@ export class AppLoggerService implements INestLoggerService {
     this.context = context;
   }
 
-  private formatMessage(level: string, message: any, context?: string): string {
+  private formatMessage(level: string, message: unknown, context?: string): string {
     const timestamp = new Date().toISOString();
     const ctx = context || this.context || "App";
     const msg = typeof message === "string" ? message : JSON.stringify(message);
