@@ -3,8 +3,8 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class RlsContextGuard implements CanActivate {
@@ -15,7 +15,7 @@ export class RlsContextGuard implements CanActivate {
     const user = request.user;
 
     if (!user?.sub) {
-      throw new UnauthorizedException('No authenticated user found');
+      throw new UnauthorizedException("No authenticated user found");
     }
 
     await this.prisma.setRlsContext(user.sub);

@@ -1,9 +1,9 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Logger } from '@nestjs/common';
+import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Logger } from "@nestjs/common";
 
-@Processor('cleanup')
+@Processor("cleanup")
 export class CleanupProcessor extends WorkerHost {
   private readonly logger = new Logger(CleanupProcessor.name);
 
@@ -13,9 +13,9 @@ export class CleanupProcessor extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     switch (job.name) {
-      case 'cleanup-expired-tokens':
+      case "cleanup-expired-tokens":
         return this.handleCleanupExpiredTokens();
-      case 'purge-soft-deleted-data':
+      case "purge-soft-deleted-data":
         return this.handlePurgeSoftDeletedData();
       default:
         throw new Error(`Unknown job name: ${job.name}`);
@@ -23,7 +23,7 @@ export class CleanupProcessor extends WorkerHost {
   }
 
   private async handleCleanupExpiredTokens() {
-    this.logger.log('Starting expired token cleanup');
+    this.logger.log("Starting expired token cleanup");
 
     try {
       const result = await this.prisma.refreshToken.deleteMany({
@@ -49,7 +49,7 @@ export class CleanupProcessor extends WorkerHost {
         WHERE "expiresAt" < NOW()
       `;
 
-      this.logger.log('Expired token cleanup completed');
+      this.logger.log("Expired token cleanup completed");
     } catch (error: any) {
       this.logger.error(`Token cleanup failed: ${error.message}`);
       throw error;
@@ -57,7 +57,7 @@ export class CleanupProcessor extends WorkerHost {
   }
 
   private async handlePurgeSoftDeletedData() {
-    this.logger.log('Starting soft-deleted data purge');
+    this.logger.log("Starting soft-deleted data purge");
 
     try {
       const thirtyDaysAgo = new Date();
@@ -87,7 +87,7 @@ export class CleanupProcessor extends WorkerHost {
 
       this.logger.log(`Purged ${tasks.count} soft-deleted tasks`);
 
-      this.logger.log('Soft-deleted data purge completed');
+      this.logger.log("Soft-deleted data purge completed");
     } catch (error: any) {
       this.logger.error(`Data purge failed: ${error.message}`);
       throw error;

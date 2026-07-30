@@ -1,4 +1,4 @@
-import { Task } from '@prisma/client';
+import { Task } from "@prisma/client";
 
 export class TaskEntity {
   id: string;

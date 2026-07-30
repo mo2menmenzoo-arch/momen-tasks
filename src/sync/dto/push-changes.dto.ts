@@ -1,4 +1,11 @@
-import { IsString, IsArray, IsUUID, IsDateString, IsObject, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsArray,
+  IsUUID,
+  IsDateString,
+  IsObject,
+  IsEnum,
+} from "class-validator";
 
 export class FieldChangeDto {
   @IsString()
@@ -21,8 +28,8 @@ export class SyncChangeDto {
   @IsUUID()
   entityId: string;
 
-  @IsEnum(['create', 'update', 'delete'])
-  operation: 'create' | 'update' | 'delete';
+  @IsEnum(["create", "update", "delete"])
+  operation: "create" | "update" | "delete";
 
   @IsDateString()
   timestamp: Date;

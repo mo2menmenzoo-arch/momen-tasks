@@ -2,8 +2,8 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class DependenciesService {
@@ -19,7 +19,7 @@ export class DependenciesService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     const dependencies: any[] = [];
@@ -32,7 +32,7 @@ export class DependenciesService {
       if (blocker) {
         dependencies.push({
           id: `${taskId}-${blockedById}`,
-          type: 'blocked_by',
+          type: "blocked_by",
           taskId: blockedById,
           taskTitle: blocker.title,
           taskStatus: blocker.status,
@@ -48,7 +48,7 @@ export class DependenciesService {
       if (blocked) {
         dependencies.push({
           id: `${taskId}-${blockedId}`,
-          type: 'blocks',
+          type: "blocks",
           taskId: blockedId,
           taskTitle: blocked.title,
           taskStatus: blocked.status,
@@ -57,7 +57,10 @@ export class DependenciesService {
     }
 
     if (includeTransitive) {
-      const transitiveBlockers = await this.getTransitiveBlockers(userId, taskId);
+      const transitiveBlockers = await this.getTransitiveBlockers(
+        userId,
+        taskId,
+      );
       for (const blockerId of transitiveBlockers) {
         if (!task.blockedBy.includes(blockerId)) {
           const blocker = await this.prisma.task.findUnique({
@@ -67,7 +70,7 @@ export class DependenciesService {
           if (blocker) {
             dependencies.push({
               id: `${taskId}-${blockerId}`,
-              type: 'transitive_blocked_by',
+              type: "transitive_blocked_by",
               taskId: blockerId,
               taskTitle: blocker.title,
               taskStatus: blocker.status,
@@ -90,7 +93,7 @@ export class DependenciesService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     const dependency = await this.prisma.task.findFirst({
@@ -102,11 +105,11 @@ export class DependenciesService {
     });
 
     if (!dependency) {
-      throw new NotFoundException('Dependency task not found');
+      throw new NotFoundException("Dependency task not found");
     }
 
     if (taskId === dependencyId) {
-      throw new BadRequestException('A task cannot depend on itself');
+      throw new BadRequestException("A task cannot depend on itself");
     }
 
     const updatedTask = await this.prisma.task.update({
@@ -128,7 +131,7 @@ export class DependenciesService {
     });
 
     return {
-      message: 'Dependency added successfully',
+      message: "Dependency added successfully",
       blockedBy: updatedTask.blockedBy,
     };
   }
@@ -143,11 +146,11 @@ export class DependenciesService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     if (!task.blockedBy.includes(dependencyId)) {
-      throw new BadRequestException('Dependency not found');
+      throw new BadRequestException("Dependency not found");
     }
 
     await this.prisma.task.update({
@@ -170,13 +173,14 @@ export class DependenciesService {
       });
     }
 
-    return { message: 'Dependency removed successfully' };
+    return { message: "Dependency removed successfully" };
   }
 
-  private async getTransitiveBlockers(userId: string, taskId: string): Promise<string[]> {
-    const results = await this.prisma.$queryRaw<
-      Array<{ blocker_id: string }>
-    >`
+  private async getTransitiveBlockers(
+    userId: string,
+    taskId: string,
+  ): Promise<string[]> {
+    const results = await this.prisma.$queryRaw<Array<{ blocker_id: string }>>`
       WITH RECURSIVE blockers AS (
         SELECT unnest(blocked_by) as blocker_id, 0 as depth
         FROM "Task"

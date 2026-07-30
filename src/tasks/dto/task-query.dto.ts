@@ -1,5 +1,12 @@
-import { IsOptional, IsString, IsEnum, IsBoolean, IsArray, IsDateString } from 'class-validator';
-import { TaskPriority, TaskStatus } from '@prisma/client';
+import {
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsBoolean,
+  IsArray,
+  IsDateString,
+} from "class-validator";
+import { TaskPriority, TaskStatus } from "@prisma/client";
 
 export class TaskQueryDto {
   @IsOptional()
@@ -37,9 +44,9 @@ export class TaskQueryDto {
 
   @IsOptional()
   @IsString()
-  sortBy?: 'createdAt' | 'dueDate' | 'priority' | 'updatedAt';
+  sortBy?: "createdAt" | "dueDate" | "priority" | "updatedAt";
 
   @IsOptional()
   @IsString()
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }

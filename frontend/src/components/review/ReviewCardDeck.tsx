@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { StatsCard } from './StatsCard';
-import { RadarChartComponent } from './RadarChart';
-import { ClarityTrend } from './ClarityTrend';
 import { AiSuggestions } from './AiSuggestions';
 import { ReflectionJournal } from './ReflectionJournal';
 import { useWeeklyReview, useMetrics, useMetricsHistory } from '@/hooks/useClarity';
 import { Button } from '@/components/common/Button';
+
+const LazyRadarChart = lazy(() => import('./RadarChart').then(m => ({ default: m.RadarChartComponent })));
+const LazyClarityTrend = lazy(() => import('./ClarityTrend').then(m => ({ default: m.ClarityTrend })));
+
+function SuspenseWrapper({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<div className="review-card" style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="body-sm text-secondary">Loading chart...</p></div>}>{children}</Suspense>;
+}
 
 export function ReviewCardDeck() {
   const [currentCard, setCurrentCard] = useState(0);
@@ -16,8 +21,8 @@ export function ReviewCardDeck() {
 
   const cards = [
     <StatsCard key="stats" data={weeklyReview} />,
-    <RadarChartComponent key="radar" metric={metrics} />,
-    <ClarityTrend key="trend" data={history} />,
+    <SuspenseWrapper key="radar"><LazyRadarChart metric={metrics} /></SuspenseWrapper>,
+    <SuspenseWrapper key="trend"><LazyClarityTrend data={history} /></SuspenseWrapper>,
     <AiSuggestions key="ai" suggestions={weeklyReview?.suggestions || []} />,
     <ReflectionJournal key="journal" />,
   ];

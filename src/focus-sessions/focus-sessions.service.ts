@@ -3,18 +3,21 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { StartSessionDto } from './dto/start-session.dto';
-import { EndSessionDto } from './dto/end-session.dto';
-import { SessionQueryDto } from './dto/session-query.dto';
-import { FocusSessionEntity } from './entities/focus-session.entity';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { StartSessionDto } from "./dto/start-session.dto";
+import { EndSessionDto } from "./dto/end-session.dto";
+import { SessionQueryDto } from "./dto/session-query.dto";
+import { FocusSessionEntity } from "./entities/focus-session.entity";
 
 @Injectable()
 export class FocusSessionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(userId: string, query: SessionQueryDto): Promise<FocusSessionEntity[]> {
+  async findAll(
+    userId: string,
+    query: SessionQueryDto,
+  ): Promise<FocusSessionEntity[]> {
     const where: any = {
       userId,
     };
@@ -35,7 +38,7 @@ export class FocusSessionsService {
 
     const sessions = await this.prisma.focusSession.findMany({
       where,
-      orderBy: { startedAt: 'desc' },
+      orderBy: { startedAt: "desc" },
     });
 
     return sessions.map(FocusSessionEntity.fromFocusSession);
@@ -47,7 +50,7 @@ export class FocusSessionsService {
         userId,
         endedAt: null,
       },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { startedAt: "desc" },
     });
 
     if (!session) {
@@ -70,7 +73,7 @@ export class FocusSessionsService {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     const activeSession = await this.prisma.focusSession.findFirst({
@@ -117,7 +120,7 @@ export class FocusSessionsService {
     });
 
     if (!session) {
-      throw new NotFoundException('Active focus session not found');
+      throw new NotFoundException("Active focus session not found");
     }
 
     const endedSession = await this.prisma.focusSession.update({

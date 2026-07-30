@@ -8,8 +8,8 @@ import {
   IsBoolean,
   IsUUID,
   IsObject,
-} from 'class-validator';
-import { TaskPriority, TaskStatus, TaskSource } from '@prisma/client';
+} from "class-validator";
+import { TaskPriority, TaskStatus, TaskSource } from "@prisma/client";
 
 export class CreateTaskDto {
   @IsString()

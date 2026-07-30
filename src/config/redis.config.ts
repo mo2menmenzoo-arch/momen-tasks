@@ -1,6 +1,6 @@
 export default () => {
-  const redisUrl = process.env.REDIS_URL || '';
-  let host = 'localhost';
+  const redisUrl = process.env.REDIS_URL || "";
+  let host = "localhost";
   let port = 6379;
   let password: string | undefined;
   let tls: object | undefined;
@@ -13,19 +13,19 @@ export default () => {
       if (url.username || url.password) {
         password = url.password || process.env.REDIS_TOKEN;
       }
-      if (url.protocol === 'rediss:') {
+      if (url.protocol === "rediss:") {
         tls = {};
       }
     } catch {
       // Fallback for malformed URLs
-      const cleaned = redisUrl.replace(/^rediss?:\/\//, '');
-      const atIdx = cleaned.lastIndexOf('@');
+      const cleaned = redisUrl.replace(/^rediss?:\/\//, "");
+      const atIdx = cleaned.lastIndexOf("@");
       const hostPort = atIdx >= 0 ? cleaned.substring(atIdx + 1) : cleaned;
-      const parts = hostPort.split(':');
+      const parts = hostPort.split(":");
       host = parts[0] || host;
-      port = parseInt(parts[1] || '6379', 10) || port;
+      port = parseInt(parts[1] || "6379", 10) || port;
       password = process.env.REDIS_TOKEN;
-      if (redisUrl.startsWith('rediss://')) {
+      if (redisUrl.startsWith("rediss://")) {
         tls = {};
       }
     }

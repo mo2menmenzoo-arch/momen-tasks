@@ -1,4 +1,4 @@
-import { Template } from '@prisma/client';
+import { Template } from "@prisma/client";
 
 export class TemplateEntity {
   id: string;

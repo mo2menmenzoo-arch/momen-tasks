@@ -1,5 +1,5 @@
-import { IsEnum, IsOptional } from 'class-validator';
-import { ZoneRole } from '@prisma/client';
+import { IsEnum, IsOptional } from "class-validator";
+import { ZoneRole } from "@prisma/client";
 
 export class UpdateMemberDto {
   @IsOptional()

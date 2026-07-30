@@ -3,11 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AddMemberDto } from './dto/add-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
-import { ZoneRole } from '@prisma/client';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { AddMemberDto } from "./dto/add-member.dto";
+import { UpdateMemberDto } from "./dto/update-member.dto";
+import { ZoneRole } from "@prisma/client";
 
 @Injectable()
 export class ZoneMembersService {
@@ -18,15 +18,12 @@ export class ZoneMembersService {
       where: {
         id: zoneId,
         deletedAt: null,
-        OR: [
-          { ownerId: userId },
-          { members: { some: { userId } } },
-        ],
+        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
       },
     });
 
     if (!zone) {
-      throw new NotFoundException('Zone not found');
+      throw new NotFoundException("Zone not found");
     }
 
     const members = await this.prisma.zoneMember.findMany({
@@ -52,11 +49,7 @@ export class ZoneMembersService {
     }));
   }
 
-  async addMember(
-    zoneId: string,
-    userId: string,
-    addMemberDto: AddMemberDto,
-  ) {
+  async addMember(zoneId: string, userId: string, addMemberDto: AddMemberDto) {
     const zone = await this.prisma.zone.findFirst({
       where: {
         id: zoneId,
@@ -67,7 +60,7 @@ export class ZoneMembersService {
 
     if (!zone) {
       throw new NotFoundException(
-        'Zone not found or you do not have permission to add members',
+        "Zone not found or you do not have permission to add members",
       );
     }
 
@@ -76,7 +69,7 @@ export class ZoneMembersService {
     });
 
     if (!targetUser) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     const existingMember = await this.prisma.zoneMember.findUnique({
@@ -89,7 +82,7 @@ export class ZoneMembersService {
     });
 
     if (existingMember) {
-      throw new ConflictException('User is already a member of this zone');
+      throw new ConflictException("User is already a member of this zone");
     }
 
     const member = await this.prisma.zoneMember.create({
@@ -113,8 +106,8 @@ export class ZoneMembersService {
     await this.prisma.auditLog.create({
       data: {
         actorId: userId,
-        action: 'ZONE_MEMBER_ADDED',
-        targetType: 'Zone',
+        action: "ZONE_MEMBER_ADDED",
+        targetType: "Zone",
         targetId: zoneId,
         metadata: {
           addedUserId: targetUser.id,
@@ -148,7 +141,7 @@ export class ZoneMembersService {
 
     if (!zone) {
       throw new NotFoundException(
-        'Zone not found or you do not have permission to manage members',
+        "Zone not found or you do not have permission to manage members",
       );
     }
 
@@ -162,7 +155,7 @@ export class ZoneMembersService {
     });
 
     if (!member) {
-      throw new NotFoundException('Member not found');
+      throw new NotFoundException("Member not found");
     }
 
     const oldRole = member.role;
@@ -190,8 +183,8 @@ export class ZoneMembersService {
     await this.prisma.auditLog.create({
       data: {
         actorId: userId,
-        action: 'ZONE_MEMBER_ROLE_CHANGED',
-        targetType: 'Zone',
+        action: "ZONE_MEMBER_ROLE_CHANGED",
+        targetType: "Zone",
         targetId: zoneId,
         metadata: {
           targetUserId,
@@ -221,7 +214,7 @@ export class ZoneMembersService {
 
     if (!zone) {
       throw new NotFoundException(
-        'Zone not found or you do not have permission to manage members',
+        "Zone not found or you do not have permission to manage members",
       );
     }
 
@@ -235,7 +228,7 @@ export class ZoneMembersService {
     });
 
     if (!member) {
-      throw new NotFoundException('Member not found');
+      throw new NotFoundException("Member not found");
     }
 
     await this.prisma.zoneMember.delete({
@@ -250,8 +243,8 @@ export class ZoneMembersService {
     await this.prisma.auditLog.create({
       data: {
         actorId: userId,
-        action: 'ZONE_MEMBER_REMOVED',
-        targetType: 'Zone',
+        action: "ZONE_MEMBER_REMOVED",
+        targetType: "Zone",
         targetId: zoneId,
         metadata: {
           removedUserId: targetUserId,
@@ -259,6 +252,6 @@ export class ZoneMembersService {
       },
     });
 
-    return { message: 'Member removed successfully' };
+    return { message: "Member removed successfully" };
   }
 }

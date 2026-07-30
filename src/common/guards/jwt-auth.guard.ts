@@ -3,17 +3,17 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { Request } from "express";
 
 export interface JwtPayload {
   sub: string;
   email: string;
   username?: string | null;
   role: string;
-  type: 'access';
+  type: "access";
 }
 
 @Injectable()
@@ -28,29 +28,29 @@ export class JwtAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('No access token provided');
+      throw new UnauthorizedException("No access token provided");
     }
 
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: this.configService.get<string>('JWT_CONFIG.accessSecret'),
+        secret: this.configService.get<string>("JWT_CONFIG.accessSecret"),
       });
 
-      if (payload.type !== 'access') {
-        throw new UnauthorizedException('Invalid token type');
+      if (payload.type !== "access") {
+        throw new UnauthorizedException("Invalid token type");
       }
 
       request.user = payload;
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired access token');
+      throw new UnauthorizedException("Invalid or expired access token");
     }
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
     const auth = request.headers.authorization;
     if (!auth) return undefined;
-    const [type, token] = auth.split(' ');
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = auth.split(" ");
+    return type === "Bearer" ? token : undefined;
   }
 }

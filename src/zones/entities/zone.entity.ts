@@ -1,4 +1,4 @@
-import { Zone } from '@prisma/client';
+import { Zone } from "@prisma/client";
 
 export class ZoneEntity {
   id: string;

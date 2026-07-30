@@ -3,21 +3,26 @@ import {
   NotFoundException,
   BadRequestException,
   Optional,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { NotificationQueryDto } from './dto/notification-query.dto';
-import { NotificationEntity } from './entities/notification.entity';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { NotificationQueryDto } from "./dto/notification-query.dto";
+import { NotificationEntity } from "./entities/notification.entity";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
 
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly prisma: PrismaService,
-    @Optional() @InjectQueue('notification') private readonly notificationQueue: Queue,
+    @Optional()
+    @InjectQueue("notification")
+    private readonly notificationQueue: Queue,
   ) {}
 
-  async findAll(userId: string, query: NotificationQueryDto): Promise<NotificationEntity[]> {
+  async findAll(
+    userId: string,
+    query: NotificationQueryDto,
+  ): Promise<NotificationEntity[]> {
     const where: any = {
       userId,
     };
@@ -32,13 +37,16 @@ export class NotificationsService {
 
     const notifications = await this.prisma.notification.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return notifications.map(NotificationEntity.fromNotification);
   }
 
-  async markRead(userId: string, notificationId: string): Promise<NotificationEntity> {
+  async markRead(
+    userId: string,
+    notificationId: string,
+  ): Promise<NotificationEntity> {
     const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
@@ -47,36 +55,39 @@ export class NotificationsService {
     });
 
     if (!notification) {
-      throw new NotFoundException('Notification not found');
+      throw new NotFoundException("Notification not found");
     }
 
     const updatedNotification = await this.prisma.notification.update({
       where: { id: notificationId },
-      data: { status: 'SENT' },
+      data: { status: "SENT" },
     });
 
     return NotificationEntity.fromNotification(updatedNotification);
   }
 
-  async cancel(userId: string, notificationId: string): Promise<{ message: string }> {
+  async cancel(
+    userId: string,
+    notificationId: string,
+  ): Promise<{ message: string }> {
     const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
         userId,
-        status: 'PENDING',
+        status: "PENDING",
       },
     });
 
     if (!notification) {
-      throw new NotFoundException('Notification not found or already sent');
+      throw new NotFoundException("Notification not found or already sent");
     }
 
     await this.prisma.notification.update({
       where: { id: notificationId },
-      data: { status: 'CANCELLED' },
+      data: { status: "CANCELLED" },
     });
 
-    return { message: 'Notification cancelled successfully' };
+    return { message: "Notification cancelled successfully" };
   }
 
   async scheduleNotification(
@@ -93,13 +104,13 @@ export class NotificationsService {
         type: type as any,
         scheduledAt,
         payload: payload as any,
-        status: 'PENDING',
+        status: "PENDING",
       },
     });
 
     if (this.notificationQueue) {
       await this.notificationQueue.add(
-        'dispatch-notification',
+        "dispatch-notification",
         {
           notificationId: notification.id,
           userId,

@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class ZoneDistribution {
-  compute(distribution: Record<string, { minutes: number; count: number }>): number {
+  compute(
+    distribution: Record<string, { minutes: number; count: number }>,
+  ): number {
     const values = Object.values(distribution);
     if (values.length === 0) return 0;
 
@@ -18,10 +20,12 @@ export class ZoneDistribution {
     }
 
     const standardDeviation = Math.sqrt(variance / values.length);
-    const coefficientOfVariation = idealDistribution > 0
-      ? standardDeviation / idealDistribution
-      : 0;
+    const coefficientOfVariation =
+      idealDistribution > 0 ? standardDeviation / idealDistribution : 0;
 
-    return Math.max(0, Math.min(100, Math.round((1 - coefficientOfVariation) * 100)));
+    return Math.max(
+      0,
+      Math.min(100, Math.round((1 - coefficientOfVariation) * 100)),
+    );
   }
 }

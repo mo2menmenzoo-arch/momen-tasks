@@ -1,5 +1,11 @@
-import { IsString, IsOptional, IsEnum, IsObject, IsDateString } from 'class-validator';
-import { ThemePreference } from '@prisma/client';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsObject,
+  IsDateString,
+} from "class-validator";
+import { ThemePreference } from "@prisma/client";
 
 export class UpdateUserDto {
   @IsOptional()

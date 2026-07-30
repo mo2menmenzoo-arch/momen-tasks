@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class StreakCalculator {
-  calculate(dailyMetrics: Array<{ date: string; tasksCompleted: number }>): number {
+  calculate(
+    dailyMetrics: Array<{ date: string; tasksCompleted: number }>,
+  ): number {
     if (!dailyMetrics.length) return 0;
 
     const sorted = [...dailyMetrics].sort(

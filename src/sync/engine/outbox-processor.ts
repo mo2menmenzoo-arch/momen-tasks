@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { SyncChangeDto } from '../dto/push-changes.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { SyncChangeDto } from "../dto/push-changes.dto";
 
 @Injectable()
 export class OutboxProcessor {
@@ -15,19 +15,19 @@ export class OutboxProcessor {
 
     for (const change of changes) {
       try {
-        if (change.operation === 'create') {
+        if (change.operation === "create") {
           await this.prisma.task.create({
             data: {
-              title: (change.data as any)?.title || 'Untitled',
+              title: (change.data as any)?.title || "Untitled",
               ownerId: userId,
             },
           });
-        } else if (change.operation === 'update') {
+        } else if (change.operation === "update") {
           await this.prisma.task.update({
             where: { id: change.entityId },
             data: change.data as any,
           });
-        } else if (change.operation === 'delete') {
+        } else if (change.operation === "delete") {
           await this.prisma.task.update({
             where: { id: change.entityId },
             data: { deletedAt: new Date() },

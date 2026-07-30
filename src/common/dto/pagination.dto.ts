@@ -1,5 +1,12 @@
-import { IsInt, IsOptional, Min, IsString, IsArray, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsInt,
+  IsOptional,
+  Min,
+  IsString,
+  IsArray,
+  IsBoolean,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export class PaginationDto {
   @IsOptional()
@@ -20,7 +27,7 @@ export class PaginationDto {
 
   @IsOptional()
   @IsString()
-  sortOrder?: 'asc' | 'desc' = 'desc';
+  sortOrder?: "asc" | "desc" = "desc";
 }
 
 export class PaginatedResponse<T> {

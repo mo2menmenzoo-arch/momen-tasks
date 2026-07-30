@@ -1,4 +1,4 @@
-import { IsString, IsArray, IsDateString, IsOptional } from 'class-validator';
+import { IsString, IsArray, IsDateString, IsOptional } from "class-validator";
 
 export class PullChangesDto {
   @IsDateString()

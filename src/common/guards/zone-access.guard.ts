@@ -4,11 +4,11 @@ import {
   Injectable,
   ForbiddenException,
   NotFoundException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { PrismaService } from '../../prisma/prisma.service';
-import { ROLES_KEY } from '../decorators/roles.decorator';
-import { ZoneRole } from '@prisma/client';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { PrismaService } from "../../prisma/prisma.service";
+import { ROLES_KEY } from "../decorators/roles.decorator";
+import { ZoneRole } from "@prisma/client";
 
 @Injectable()
 export class ZoneAccessGuard implements CanActivate {
@@ -45,7 +45,7 @@ export class ZoneAccessGuard implements CanActivate {
     });
 
     if (!zone) {
-      throw new NotFoundException('Zone not found');
+      throw new NotFoundException("Zone not found");
     }
 
     if (zone.ownerId === user.sub) {
@@ -54,12 +54,12 @@ export class ZoneAccessGuard implements CanActivate {
 
     const membership = zone.members[0];
     if (!membership) {
-      throw new ForbiddenException('You do not have access to this zone');
+      throw new ForbiddenException("You do not have access to this zone");
     }
 
     if (!requiredRoles.includes(membership.role)) {
       throw new ForbiddenException(
-        `Requires one of: ${requiredRoles.join(', ')}. You have: ${membership.role}`,
+        `Requires one of: ${requiredRoles.join(", ")}. You have: ${membership.role}`,
       );
     }
 

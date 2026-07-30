@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsBoolean, IsInt, Min } from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsInt, Min } from "class-validator";
 
 export class ZoneQueryDto {
   @IsOptional()

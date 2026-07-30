@@ -3,12 +3,12 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateZoneDto } from './dto/create-zone.dto';
-import { UpdateZoneDto } from './dto/update-zone.dto';
-import { ZoneQueryDto } from './dto/zone-query.dto';
-import { ZoneEntity } from './entities/zone.entity';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateZoneDto } from "./dto/create-zone.dto";
+import { UpdateZoneDto } from "./dto/update-zone.dto";
+import { ZoneQueryDto } from "./dto/zone-query.dto";
+import { ZoneEntity } from "./entities/zone.entity";
 
 @Injectable()
 export class ZonesService {
@@ -31,7 +31,7 @@ export class ZonesService {
         ],
         deletedAt: null,
       },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { sortOrder: "asc" },
     });
 
     return zones.map(ZoneEntity.fromZone);
@@ -54,13 +54,16 @@ export class ZonesService {
     });
 
     if (!zone) {
-      throw new NotFoundException('Zone not found');
+      throw new NotFoundException("Zone not found");
     }
 
     return ZoneEntity.fromZone(zone);
   }
 
-  async create(userId: string, createZoneDto: CreateZoneDto): Promise<ZoneEntity> {
+  async create(
+    userId: string,
+    createZoneDto: CreateZoneDto,
+  ): Promise<ZoneEntity> {
     const zone = await this.prisma.zone.create({
       data: {
         ...createZoneDto,
@@ -85,7 +88,9 @@ export class ZonesService {
     });
 
     if (!zone) {
-      throw new NotFoundException('Zone not found or you do not have permission to edit it');
+      throw new NotFoundException(
+        "Zone not found or you do not have permission to edit it",
+      );
     }
 
     const updatedZone = await this.prisma.zone.update({
@@ -106,7 +111,9 @@ export class ZonesService {
     });
 
     if (!zone) {
-      throw new NotFoundException('Zone not found or you do not have permission to delete it');
+      throw new NotFoundException(
+        "Zone not found or you do not have permission to delete it",
+      );
     }
 
     await this.prisma.zone.update({
@@ -115,7 +122,7 @@ export class ZonesService {
     });
 
     return {
-      message: 'Zone deleted. It will be permanently removed within 30 days.',
+      message: "Zone deleted. It will be permanently removed within 30 days.",
     };
   }
 }

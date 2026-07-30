@@ -1,9 +1,9 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { ClarityEngineService } from '../../clarity-engine/clarity-engine.service';
-import { Logger } from '@nestjs/common';
+import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { ClarityEngineService } from "../../clarity-engine/clarity-engine.service";
+import { Logger } from "@nestjs/common";
 
-@Processor('clarity-engine')
+@Processor("clarity-engine")
 export class ClarityEngineProcessor extends WorkerHost {
   private readonly logger = new Logger(ClarityEngineProcessor.name);
 
@@ -13,14 +13,18 @@ export class ClarityEngineProcessor extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     switch (job.name) {
-      case 'compute-clarity-metric':
-        return this.handleComputeClarityMetric(job as Job<{ userId: string; date: string }>);
+      case "compute-clarity-metric":
+        return this.handleComputeClarityMetric(
+          job as Job<{ userId: string; date: string }>,
+        );
       default:
         throw new Error(`Unknown job name: ${job.name}`);
     }
   }
 
-  private async handleComputeClarityMetric(job: Job<{ userId: string; date: string }>) {
+  private async handleComputeClarityMetric(
+    job: Job<{ userId: string; date: string }>,
+  ) {
     this.logger.log(
       `Processing clarity metric computation for user ${job.data.userId} on ${job.data.date}`,
     );

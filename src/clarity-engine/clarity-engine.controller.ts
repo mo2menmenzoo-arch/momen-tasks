@@ -1,33 +1,24 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Param,
-} from '@nestjs/common';
-import { ClarityEngineService } from './clarity-engine.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RlsContextGuard } from '../common/guards/rls-context.guard';
-import { User } from '../common/decorators/user.decorator';
+import { Controller, Get, Query, UseGuards, Param } from "@nestjs/common";
+import { ClarityEngineService } from "./clarity-engine.service";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RlsContextGuard } from "../common/guards/rls-context.guard";
+import { User } from "../common/decorators/user.decorator";
 
-@Controller('clarity-engine')
+@Controller("clarity-engine")
 @UseGuards(JwtAuthGuard, RlsContextGuard)
 export class ClarityEngineController {
   constructor(private readonly clarityEngineService: ClarityEngineService) {}
 
-  @Get('metrics')
-  async getMetrics(
-    @User('sub') userId: string,
-    @Query('date') date: string,
-  ) {
+  @Get("metrics")
+  async getMetrics(@User("sub") userId: string, @Query("date") date: string) {
     const metricDate = date ? new Date(date) : new Date();
     return this.clarityEngineService.getMetrics(userId, metricDate);
   }
 
-  @Get('metrics/history')
+  @Get("metrics/history")
   async getMetricsHistory(
-    @User('sub') userId: string,
-    @Query('days') days: string,
+    @User("sub") userId: string,
+    @Query("days") days: string,
   ) {
     return this.clarityEngineService.getMetricsHistory(
       userId,
@@ -35,8 +26,8 @@ export class ClarityEngineController {
     );
   }
 
-  @Get('weekly-review')
-  async getWeeklyReview(@User('sub') userId: string) {
+  @Get("weekly-review")
+  async getWeeklyReview(@User("sub") userId: string) {
     return this.clarityEngineService.getWeeklyReview(userId);
   }
 }

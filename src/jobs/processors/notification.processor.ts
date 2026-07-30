@@ -1,9 +1,9 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Logger } from '@nestjs/common';
+import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Logger } from "@nestjs/common";
 
-@Processor('notification')
+@Processor("notification")
 export class NotificationProcessor extends WorkerHost {
   private readonly logger = new Logger(NotificationProcessor.name);
 
@@ -13,7 +13,7 @@ export class NotificationProcessor extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     switch (job.name) {
-      case 'dispatch-notification':
+      case "dispatch-notification":
         return this.handleDispatchNotification(job);
       default:
         throw new Error(`Unknown job name: ${job.name}`);
@@ -34,9 +34,9 @@ export class NotificationProcessor extends WorkerHost {
 
       for (const subscription of pushSubscriptions) {
         try {
-          const webpush = require('web-push');
+          const webpush = require("web-push");
           webpush.setVapidDetails(
-            'mailto:notifications@momen.app',
+            "mailto:notifications@momen.app",
             process.env.VAPID_PUBLIC_KEY,
             process.env.VAPID_PRIVATE_KEY,
           );
@@ -45,8 +45,8 @@ export class NotificationProcessor extends WorkerHost {
             title: payload.title,
             body: payload.body,
             data: payload.data,
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/badge-72x72.png',
+            icon: "/icons/icon-192x192.png",
+            badge: "/icons/badge-72x72.png",
           });
 
           await webpush.sendNotification(
@@ -80,14 +80,12 @@ export class NotificationProcessor extends WorkerHost {
       await this.prisma.notification.update({
         where: { id: notificationId },
         data: {
-          status: 'SENT',
+          status: "SENT",
           sentAt: new Date(),
         },
       });
 
-      this.logger.log(
-        `Notification ${notificationId} dispatched successfully`,
-      );
+      this.logger.log(`Notification ${notificationId} dispatched successfully`);
     } catch (error: any) {
       this.logger.error(
         `Failed to dispatch notification ${job.data.notificationId}: ${error.message}`,
@@ -95,7 +93,7 @@ export class NotificationProcessor extends WorkerHost {
 
       await this.prisma.notification.update({
         where: { id: job.data.notificationId },
-        data: { status: 'FAILED' },
+        data: { status: "FAILED" },
       });
 
       throw error;

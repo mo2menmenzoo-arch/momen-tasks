@@ -1,5 +1,5 @@
-import { IsEmail, IsEnum } from 'class-validator';
-import { ZoneRole } from '@prisma/client';
+import { IsEmail, IsEnum } from "class-validator";
+import { ZoneRole } from "@prisma/client";
 
 export class AddMemberDto {
   @IsEmail()

@@ -1,35 +1,42 @@
-import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
-import express from 'express';
-import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
+import "reflect-metadata";
+import { NestFactory } from "@nestjs/core";
+import { ExpressAdapter } from "@nestjs/platform-express";
+import { ValidationPipe, VersioningType } from "@nestjs/common";
+import cookieParser from "cookie-parser";
+import express from "express";
+import { AppModule } from "./app.module";
+import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { PrismaExceptionFilter } from "./common/filters/prisma-exception.filter";
+import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
+import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
+import { TimeoutInterceptor } from "./common/interceptors/timeout.interceptor";
 
 let cachedServer: any;
 let initError: Error | null = null;
 
 async function createServer() {
   const expressApp = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
-    bufferLogs: true,
-    logger: process.env.NODE_ENV === 'production' ? ['error', 'warn', 'log'] : ['error', 'warn', 'log', 'debug', 'verbose'],
-  });
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+    {
+      bufferLogs: true,
+      logger:
+        process.env.NODE_ENV === "production"
+          ? ["error", "warn", "log"]
+          : ["error", "warn", "log", "debug", "verbose"],
+    },
+  );
 
   app.use(cookieParser());
   app.enableCors({
-    origin: (process.env.FRONTEND_URL || '*').trim(),
+    origin: (process.env.FRONTEND_URL || "*").trim(),
     credentials: true,
   });
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '1',
-    prefix: 'api/v',
+    defaultVersion: "1",
+    prefix: "api/v",
   });
 
   app.useGlobalPipes(
@@ -54,13 +61,15 @@ async function createServer() {
 export default async function handler(req: any, res: any) {
   if (initError) {
     res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({
-      success: false,
-      error: 'Server initialization failed',
-      message: initError.message,
-      stack: initError.stack,
-    }));
+    res.setHeader("Content-Type", "application/json");
+    return res.end(
+      JSON.stringify({
+        success: false,
+        error: "Server initialization failed",
+        message: initError.message,
+        stack: initError.stack,
+      }),
+    );
   }
 
   if (!cachedServer) {
@@ -68,21 +77,23 @@ export default async function handler(req: any, res: any) {
       cachedServer = await createServer();
     } catch (error: any) {
       initError = error;
-      console.error('Failed to initialize NestJS server:', error);
+      console.error("Failed to initialize NestJS server:", error);
       res.statusCode = 500;
-      res.setHeader('Content-Type', 'application/json');
-      return res.end(JSON.stringify({
-        success: false,
-        error: 'Server initialization failed',
-        message: error.message,
-        stack: error.stack,
-      }));
+      res.setHeader("Content-Type", "application/json");
+      return res.end(
+        JSON.stringify({
+          success: false,
+          error: "Server initialization failed",
+          message: error.message,
+          stack: error.stack,
+        }),
+      );
     }
   }
   try {
     return cachedServer(req, res);
   } catch (e: any) {
-    console.error('cachedServer error:', e.message);
+    console.error("cachedServer error:", e.message);
     throw e;
   }
 }

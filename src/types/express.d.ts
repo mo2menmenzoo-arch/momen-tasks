@@ -1,6 +1,6 @@
-import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { JwtPayload } from "../auth/interfaces/jwt-payload.interface";
 
-declare module 'express' {
+declare module "express" {
   interface Request {
     user?: JwtPayload;
   }

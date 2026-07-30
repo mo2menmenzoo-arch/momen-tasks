@@ -3,5 +3,5 @@ export interface JwtPayload {
   email: string;
   username?: string | null;
   role: string;
-  type: 'access' | 'refresh';
+  type: "access" | "refresh";
 }

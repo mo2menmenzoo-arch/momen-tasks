@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { ClarityScore } from './scoring/clarity-score';
-import { ZoneDistribution } from './scoring/zone-distribution';
-import { StreakCalculator } from './scoring/streak-calculator';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { ClarityScore } from "./scoring/clarity-score";
+import { ZoneDistribution } from "./scoring/zone-distribution";
+import { StreakCalculator } from "./scoring/streak-calculator";
 
 @Injectable()
 export class ClarityEngineService {
@@ -42,7 +39,7 @@ export class ClarityEngineService {
     const tasksCompleted = await this.prisma.task.count({
       where: {
         ownerId: userId,
-        status: 'COMPLETED',
+        status: "COMPLETED",
         completedAt: { gte: startOfDay, lte: endOfDay },
       },
     });
@@ -55,7 +52,7 @@ export class ClarityEngineService {
     });
 
     const zoneTasks = await this.prisma.task.groupBy({
-      by: ['zoneId'],
+      by: ["zoneId"],
       where: {
         ownerId: userId,
         completedAt: { gte: startOfDay, lte: endOfDay },
@@ -64,7 +61,8 @@ export class ClarityEngineService {
       _count: { id: true },
     });
 
-    const zoneDistribution: Record<string, { minutes: number; count: number }> = {};
+    const zoneDistribution: Record<string, { minutes: number; count: number }> =
+      {};
     for (const zt of zoneTasks) {
       if (zt.zoneId) {
         zoneDistribution[zt.zoneId] = {
@@ -81,7 +79,7 @@ export class ClarityEngineService {
         userId,
         date: { gte: new Date(date.getTime() - 30 * 24 * 60 * 60 * 1000) },
       },
-      orderBy: { date: 'asc' },
+      orderBy: { date: "asc" },
     });
 
     const dailyMetrics = recentMetrics.map((m) => ({
@@ -94,7 +92,7 @@ export class ClarityEngineService {
     const overdueCount = await this.prisma.task.count({
       where: {
         ownerId: userId,
-        status: 'PENDING',
+        status: "PENDING",
         dueDate: { lt: startOfDay },
       },
     });
@@ -145,10 +143,7 @@ export class ClarityEngineService {
     return metric;
   }
 
-  async getMetricsHistory(
-    userId: string,
-    days: number = 30,
-  ): Promise<any[]> {
+  async getMetricsHistory(userId: string, days: number = 30): Promise<any[]> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -157,7 +152,7 @@ export class ClarityEngineService {
         userId,
         date: { gte: startDate },
       },
-      orderBy: { date: 'asc' },
+      orderBy: { date: "asc" },
     });
 
     return metrics;
@@ -173,7 +168,7 @@ export class ClarityEngineService {
         userId,
         date: { gte: startOfWeek, lte: endOfWeek },
       },
-      orderBy: { date: 'asc' },
+      orderBy: { date: "asc" },
     });
 
     const completedTasks = metrics.reduce(
@@ -181,10 +176,7 @@ export class ClarityEngineService {
       0,
     );
 
-    const createdTasks = metrics.reduce(
-      (sum, m) => sum + m.tasksCreated,
-      0,
-    );
+    const createdTasks = metrics.reduce((sum, m) => sum + m.tasksCreated, 0);
 
     const avgScore = metrics.length
       ? metrics.reduce((sum, m) => sum + (m.clarityScore || 0), 0) /
@@ -195,44 +187,61 @@ export class ClarityEngineService {
     const suggestions: string[] = [];
 
     if (completedTasks === 0) {
-      suggestions.push('Try completing at least one task today to build momentum');
+      suggestions.push(
+        "Try completing at least one task today to build momentum",
+      );
     } else if (completedTasks < 3) {
-      suggestions.push('Great start! Try to complete one more task to boost your clarity score');
+      suggestions.push(
+        "Great start! Try to complete one more task to boost your clarity score",
+      );
     }
 
     const overdueCount = await this.prisma.task.count({
       where: {
         ownerId: userId,
-        status: 'PENDING',
+        status: "PENDING",
         dueDate: { lt: new Date() },
       },
     });
 
     if (overdueCount > 0) {
-      suggestions.push(`You have ${overdueCount} overdue task${overdueCount > 1 ? 's' : ''} - consider rescheduling or completing them`);
+      suggestions.push(
+        `You have ${overdueCount} overdue task${overdueCount > 1 ? "s" : ""} - consider rescheduling or completing them`,
+      );
     }
 
     // Check zone balance
     const zoneDistribution: Record<string, number> = {};
     for (const m of metrics) {
-      if (m.zoneDistribution && typeof m.zoneDistribution === 'object') {
-        for (const [zoneId, data] of Object.entries(m.zoneDistribution as Record<string, any>)) {
-          zoneDistribution[zoneId] = (zoneDistribution[zoneId] || 0) + (data.count || 0);
+      if (m.zoneDistribution && typeof m.zoneDistribution === "object") {
+        for (const [zoneId, data] of Object.entries(
+          m.zoneDistribution as Record<string, any>,
+        )) {
+          zoneDistribution[zoneId] =
+            (zoneDistribution[zoneId] || 0) + (data.count || 0);
         }
       }
     }
 
     const zones = Object.keys(zoneDistribution);
     if (zones.length > 0) {
-      const maxZone = zones.reduce((a, b) => (zoneDistribution[a] > zoneDistribution[b] ? a : b));
-      const minZone = zones.reduce((a, b) => (zoneDistribution[a] < zoneDistribution[b] ? a : b));
+      const maxZone = zones.reduce((a, b) =>
+        zoneDistribution[a] > zoneDistribution[b] ? a : b,
+      );
+      const minZone = zones.reduce((a, b) =>
+        zoneDistribution[a] < zoneDistribution[b] ? a : b,
+      );
       if (zoneDistribution[maxZone] > zoneDistribution[minZone] * 3) {
-        suggestions.push('Your focus is heavily concentrated - try balancing across more life zones');
+        suggestions.push(
+          "Your focus is heavily concentrated - try balancing across more life zones",
+        );
       }
     }
 
     if (suggestions.length === 0) {
-      suggestions.push('Keep up the great work! Your clarity score is on track');
+      suggestions.push(
+        "Keep up the great work! Your clarity score is on track",
+      );
     }
 
     return {

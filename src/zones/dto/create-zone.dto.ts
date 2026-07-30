@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsBoolean, IsInt, IsHexColor } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsInt,
+  IsHexColor,
+} from "class-validator";
 
 export class CreateZoneDto {
   @IsString()

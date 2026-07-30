@@ -12,16 +12,16 @@ export class DateUtil {
 
   private static getTimezoneOffset(timezone: string, date: Date): number {
     try {
-      const dtf = new Intl.DateTimeFormat('en-US', {
+      const dtf = new Intl.DateTimeFormat("en-US", {
         timeZone: timezone,
-        timeZoneName: 'shortOffset',
+        timeZoneName: "shortOffset",
       });
       const parts = dtf.formatToParts(date);
-      const offsetPart = parts.find((p) => p.type === 'timeZoneName');
+      const offsetPart = parts.find((p) => p.type === "timeZoneName");
       if (offsetPart) {
         const match = offsetPart.value.match(/([+-])(\d{2}):(\d{2})/);
         if (match) {
-          const sign = match[1] === '-' ? -1 : 1;
+          const sign = match[1] === "-" ? -1 : 1;
           const hours = parseInt(match[2], 10);
           const minutes = parseInt(match[3], 10);
           return sign * (hours * 60 + minutes);

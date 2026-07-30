@@ -6,19 +6,21 @@ import {
   OnGatewayDisconnect,
   ConnectedSocket,
   MessageBody,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { RealtimeService } from './realtime.service';
-import { Logger, Inject, forwardRef } from '@nestjs/common';
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { RealtimeService } from "./realtime.service";
+import { Logger, Inject, forwardRef } from "@nestjs/common";
 
 @WebSocketGateway({
-  namespace: '/sync',
+  namespace: "/sync",
   cors: {
-    origin: (process.env.FRONTEND_URL || 'http://localhost:5173').trimEnd(),
+    origin: (process.env.FRONTEND_URL || "http://localhost:5173").trimEnd(),
     credentials: true,
   },
 })
-export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class RealtimeGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server!: Server;
 
@@ -60,9 +62,9 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     client.join(`user:${userId}`);
     this.logger.log(`User ${userId} joined room user:${userId}`);
 
-    client.emit('connected', {
+    client.emit("connected", {
       userId,
-      message: 'Connected to Momen Tasks sync',
+      message: "Connected to Momen Tasks sync",
     });
   }
 
@@ -81,7 +83,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
   }
 
-  @SubscribeMessage('zone:join')
+  @SubscribeMessage("zone:join")
   handleZoneJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { zoneId: string },
@@ -98,13 +100,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
     this.zoneRooms.get(data.zoneId)!.add(userId);
 
-    this.server.to(room).emit('zone:member:added', {
+    this.server.to(room).emit("zone:member:added", {
       zoneId: data.zoneId,
       userId,
     });
   }
 
-  @SubscribeMessage('zone:leave')
+  @SubscribeMessage("zone:leave")
   handleZoneLeave(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { zoneId: string },
@@ -118,13 +120,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     this.zoneRooms.get(data.zoneId)?.delete(userId);
 
-    this.server.to(room).emit('zone:member:removed', {
+    this.server.to(room).emit("zone:member:removed", {
       zoneId: data.zoneId,
       userId,
     });
   }
 
-  @SubscribeMessage('sync:reconnect')
+  @SubscribeMessage("sync:reconnect")
   handleSyncReconnect(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { clientId: string },
@@ -132,10 +134,12 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     const userId = this.socketUsers.get(client.id);
     if (!userId) return;
 
-    this.logger.log(`User ${userId} requested sync reconnect for client ${data.clientId}`);
-    client.emit('sync:reconnect', {
+    this.logger.log(
+      `User ${userId} requested sync reconnect for client ${data.clientId}`,
+    );
+    client.emit("sync:reconnect", {
       userId,
-      message: 'Sync reconnection initiated',
+      message: "Sync reconnection initiated",
     });
   }
 

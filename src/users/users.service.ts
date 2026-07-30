@@ -3,19 +3,19 @@ import {
   NotFoundException,
   BadRequestException,
   Optional,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UpdateNotificationPrefsDto } from './dto/update-notification-prefs.dto';
-import { UserEntity } from './entities/user.entity';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateNotificationPrefsDto } from "./dto/update-notification-prefs.dto";
+import { UserEntity } from "./entities/user.entity";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    @Optional() @InjectQueue('export') private readonly exportQueue: Queue,
+    @Optional() @InjectQueue("export") private readonly exportQueue: Queue,
   ) {}
 
   async getProfile(userId: string): Promise<UserEntity> {
@@ -24,7 +24,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     return UserEntity.fromUser(user);
@@ -52,10 +52,11 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
-    const existingPrefs = (user.notificationPrefs as Record<string, unknown>) || {};
+    const existingPrefs =
+      (user.notificationPrefs as Record<string, unknown>) || {};
     const updatedPrefs = { ...existingPrefs, ...updateNotificationPrefsDto };
 
     const updatedUser = await this.prisma.user.update({
@@ -68,25 +69,26 @@ export class UsersService {
 
   async requestDataExport(
     userId: string,
-    format: 'json' | 'csv' = 'json',
+    format: "json" | "csv" = "json",
   ): Promise<{ message: string; exportId: string }> {
     const exportId = `export_${userId}_${Date.now()}`;
 
     if (this.exportQueue) {
-      await this.exportQueue.add('generate-export', {
+      await this.exportQueue.add("generate-export", {
         userId,
         exportId,
         format,
       });
 
       return {
-        message: 'Data export request submitted. You will receive an email when ready.',
+        message:
+          "Data export request submitted. You will receive an email when ready.",
         exportId,
       };
     }
 
     return {
-      message: 'Export is not available in serverless mode.',
+      message: "Export is not available in serverless mode.",
       exportId,
     };
   }
@@ -97,7 +99,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     await this.prisma.user.update({
@@ -111,7 +113,8 @@ export class UsersService {
     });
 
     return {
-      message: 'Account scheduled for deletion. It will be permanently deleted within 30 days.',
+      message:
+        "Account scheduled for deletion. It will be permanently deleted within 30 days.",
     };
   }
 }
