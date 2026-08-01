@@ -164,31 +164,6 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  /** TEMPORARY cleanup — removes leftover automated-test accounts. Removed after one use. */
-  async cleanupTestMembers() {
-    const junkNames = [
-      "Test User",
-      "Diag",
-      "Verify",
-      "Direct",
-      "Console",
-      "Final",
-      "Full Suite",
-      "Live Test",
-      "Fresh Test",
-      "Verify Fix",
-    ];
-    const result = await this.prisma.user.updateMany({
-      where: { displayName: { in: junkNames }, deletedAt: null },
-      data: { deletedAt: new Date() },
-    });
-    this.logger.log(
-      `Cleanup: soft-deleted ${result.count} test account(s)`,
-      "AuthService",
-    );
-    return { deleted: result.count };
-  }
-
   async getUserData(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException("User not found");

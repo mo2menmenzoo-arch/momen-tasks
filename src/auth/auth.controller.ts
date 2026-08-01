@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpStatus,
   UnauthorizedException,
-  ForbiddenException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Response, Request } from "express";
@@ -26,7 +25,6 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { GoogleOAuthGuard } from "./guards/google-oauth.guard";
 import { MemberLoginDto } from "./dto/member-login.dto";
 import { CreateMemberDto } from "./dto/create-member.dto";
-import { User } from "../common/decorators/user.decorator";
 
 @Controller("auth")
 export class AuthController {
@@ -87,16 +85,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async createMember(@Body() createMemberDto: CreateMemberDto) {
     return await this.authService.createMember(createMemberDto);
-  }
-
-  // TEMPORARY: one-shot cleanup of automated-test accounts. Removed after use.
-  @Post("cleanup-test-members")
-  @UseGuards(JwtAuthGuard)
-  async cleanupTestMembers(@User("role") role: string) {
-    if (role !== "ADMIN") {
-      throw new ForbiddenException("Admin only");
-    }
-    return await this.authService.cleanupTestMembers();
   }
 
   @Post("logout")
