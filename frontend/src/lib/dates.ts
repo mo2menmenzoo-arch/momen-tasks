@@ -36,6 +36,41 @@ export function getGreeting(): string {
   return 'Good evening';
 }
 
+/**
+ * Format a date using the user's locale for month/day names.
+ * Produces Arabic month names for ar users, English names for everyone else.
+ */
+export function formatDateLocale(date: Date, locale?: string): string {
+  const lang = locale ?? navigator.language;
+  return new Intl.DateTimeFormat(lang, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
+}
+
+/**
+ * Format just the month + year using the user's locale.
+ */
+export function formatMonthYear(date: Date, locale?: string): string {
+  const lang = locale ?? navigator.language;
+  return new Intl.DateTimeFormat(lang, {
+    year: 'numeric',
+    month: 'long',
+  }).format(date);
+}
+
+/**
+ * Format a single day name (Mon, Tue, ...) using the user's locale.
+ */
+export function formatDayName(date: Date, locale?: string): string {
+  const lang = locale ?? navigator.language;
+  return new Intl.DateTimeFormat(lang, {
+    weekday: 'short',
+  }).format(date);
+}
+
 export function formatTimer(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;

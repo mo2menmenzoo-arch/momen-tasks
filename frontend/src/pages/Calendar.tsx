@@ -7,6 +7,7 @@ import { TaskCard } from '@/components/task/TaskCard';
 import { TaskDetailSheet } from '@/components/task/TaskDetailSheet';
 import { useTasks } from '@/hooks/useTasks';
 import { useZones } from '@/hooks/useZones';
+import { formatMonthYear, formatDayName } from '@/lib/dates';
 
 type CalendarView = 'day' | 'week' | 'month' | 'agenda';
 
@@ -73,7 +74,7 @@ export function Calendar() {
             <ChevronLeft size={20} />
           </Button>
           <span className="heading-lg">
-            {view === 'month' ? format(currentMonth, 'MMMM yyyy') : `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'MMM d')}`}
+            {view === 'month' ? formatMonthYear(currentMonth) : `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'MMM d')}`}
           </span>
           <Button variant="ghost" icon size="sm" onClick={() => view === 'month' ? setMonthOffset(m => m + 1) : setSelectedDate(d => addDays(d, 7))}>
             <ChevronRight size={20} />
@@ -84,9 +85,14 @@ export function Calendar() {
       {/* Month View */}
       {view === 'month' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 'var(--space-1)' }}>
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-            <div key={d} style={{ textAlign: 'center', padding: 'var(--space-1)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontWeight: 'var(--weight-medium)' }}>{d}</div>
-          ))}
+          {Array.from({ length: 7 }, (_, i) => {
+            const day = addDays(calendarStart, i);
+            return (
+              <div key={i} style={{ textAlign: 'center', padding: 'var(--space-1)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontWeight: 'var(--weight-medium)' }}>
+                {formatDayName(day)}
+              </div>
+            );
+          })}
           {monthDays.map(day => {
             const dayTasks = getTasksForDay(day);
             const isCurrentMonth = isSameMonth(day, currentMonth);
