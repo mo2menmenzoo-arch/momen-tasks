@@ -114,6 +114,20 @@ body {
 .text-center  { text-align: center; }
 .text-right   { text-align: right; }
 
+/* ── Arabic / BiDi Utilities ─────────────────────────────── */
+.text-arabic {
+  font-family: var(--font-family-arabic);
+  direction: rtl;
+}
+
+.text-mixed {
+  unicode-bidi: isolate;
+}
+
+.text-dir-auto {
+  direction: auto;
+}
+
 /* ── Text Truncation ─────────────────────────────────────── */
 .truncate {
   overflow: hidden;

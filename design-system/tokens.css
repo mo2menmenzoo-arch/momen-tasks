@@ -93,6 +93,9 @@
   --font-family-display:  'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-family-mono:     'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
+  /* ── Arabic Font ───────────────────────────────────────── */
+  --font-family-arabic:   'Cairo', 'Noto Naskh Arabic', system-ui, sans-serif;
+
   --text-xs:    0.75rem;
   --text-sm:    0.875rem;
   --text-base:  1rem;
