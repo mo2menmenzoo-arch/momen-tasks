@@ -17,6 +17,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          dir="auto"
           className={cn('input', search && 'input-search', error && 'input-error', className)}
           {...props}
         />
@@ -44,6 +45,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           id={textareaId}
+          dir="auto"
           className={cn('input textarea', error && 'input-error', className)}
           {...props}
         />
