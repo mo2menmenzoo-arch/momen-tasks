@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { useQueryClient } from '@tanstack/react-query';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || '';
 
 class WebSocketManager {
   private socket: Socket | null = null;
@@ -14,7 +14,8 @@ class WebSocketManager {
   connect(token: string) {
     if (this.socket?.connected) return;
 
-    this.socket = io(`${WS_URL}/sync`, {
+    const wsEndpoint = WS_URL ? `${WS_URL}/sync` : '/sync';
+    this.socket = io(wsEndpoint, {
       auth: { token },
       transports: ['websocket'],
       reconnection: true,

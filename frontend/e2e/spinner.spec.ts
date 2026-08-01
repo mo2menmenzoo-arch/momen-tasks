@@ -59,17 +59,6 @@ async function seedAuth(page: Page, testUser: TestUser) {
 }
 
 /**
- * Assert spinner is present and button is in loading state.
- * The spinner is conditionally rendered — only in DOM when showLoading is true.
- * Playwright considers it "hidden" via CSS cascade, so we check for
- * DOM presence via toBeAttached() instead of toBeVisible().
- */
-async function assertSpinnerVisible(button: ReturnType<Page['locator']>) {
-  await expect(button).toHaveClass(/btn-loading/, { timeout: 3000 });
-  await expect(button.locator('.btn-spinner')).toBeAttached();
-}
-
-/**
  * Click a submit button and wait for the mutation to resolve.
  *
  * Fast mutations (<300ms) → the debounce never fires, spinner never shows.
@@ -132,76 +121,49 @@ async function clickAndWaitForMutation(
   }
 }
 
-// ─── Login Page Spinner Tests ───────────────────────────────────────
+// ─── Password Screen Spinner Tests ────────────────────────────────
 
-test.describe('Login page spinner', () => {
-  test('Log In — correct credentials — spinner appears (or debounce skips on fast network)', async ({ page }) => {
+test.describe('Password screen spinner', () => {
+  test('Member login — correct password — spinner appears (or debounce skips on fast network)', async ({ page }) => {
     const testUser = await createTestUser();
 
     await page.goto('/login');
-    await expect(page.getByText('Welcome Back')).toBeVisible();
+    await expect(page.getByText("Who's using Momen?")).toBeVisible();
 
-    await page.fill('input[type="email"]', testUser.email);
+    // Pick the newly created member (last card with our display name)
+    await page.locator('.card', { hasText: 'E2E User' }).last().click();
     await page.fill('input[type="password"]', testUser.password);
 
-    const button = page.getByRole('button', { name: /log in/i });
+    const button = page.getByRole('button', { name: /enter/i });
     await clickAndWaitForMutation(page, button, { expectRedirect: /\/today/ });
   });
 
-  test('Log In — wrong credentials — spinner appears, error toast shown', async ({ page }) => {
-    await page.goto('/login');
-    await expect(page.getByText('Welcome Back')).toBeVisible();
+  test('Member login — wrong credentials — spinner appears, error toast shown', async ({ page }) => {
+    // Ensure at least one member exists to pick
+    await createTestUser();
 
-    await page.fill('input[type="email"]', 'nonexistent@test.com');
+    await page.goto('/login');
+    await expect(page.getByText("Who's using Momen?")).toBeVisible();
+
+    await page.locator('.card', { hasText: 'E2E User' }).last().click();
     await page.fill('input[type="password"]', 'WrongPass123!');
 
-    const button = page.getByRole('button', { name: /log in/i });
+    const button = page.getByRole('button', { name: /enter/i });
     await clickAndWaitForMutation(page, button, { expectToast: true });
   });
 
-  test('Sign Up — spinner appears on submit', async ({ page }) => {
-    await page.goto('/login');
-    await expect(page.getByText('Welcome Back')).toBeVisible();
+  test('Add family member — spinner appears on submit', async ({ page }) => {
+    const testUser = await createTestUser();
+    await seedAuth(page, testUser);
 
-    // Switch to signup
-    await page.getByRole('button', { name: /sign up$/i }).click();
-    await expect(page.getByText('Create Account')).toBeVisible();
+    await page.goto('/profile');
+    await expect(page.getByText('Family')).toBeVisible();
 
-    const email = `signup-e2e-${Date.now()}@test.com`;
-    await page.fill('input[type="email"]', email);
-    await page.fill('input[type="password"]', 'TestPass1234');
-    await page.locator('input:not([type])').first().fill('E2E User');
+    await page.locator('input').nth(1).fill(`Sister ${Date.now()}`);
+    await page.locator('input[type="password"]').first().fill('SisterPass1234');
 
-    const button = page.getByRole('button', { name: /sign up/i });
+    const button = page.getByRole('button', { name: /add family member/i });
     await clickAndWaitForMutation(page, button, { expectToast: true });
-  });
-
-  test('Send Magic Link — spinner appears on submit', async ({ page }) => {
-    await page.goto('/login');
-    await expect(page.getByText('Welcome Back')).toBeVisible();
-
-    // Open magic link form
-    await page.getByRole('button', { name: /send magic link/i }).click();
-    await page.waitForTimeout(300);
-
-    const emailInput = page.locator('input[type="email"]');
-    await emailInput.fill('magic@test.com');
-
-    const button = page.getByRole('button', { name: /send magic link/i });
-    await clickAndWaitForMutation(page, button, { expectToast: true });
-  });
-
-  test('Continue with Google — spinner appears (popup blocked by headless)', async ({ page }) => {
-    await page.goto('/login');
-    await expect(page.getByText('Welcome Back')).toBeVisible();
-
-    const button = page.getByRole('button', { name: /continue with google/i });
-    await button.click();
-
-    // Google popup is blocked by headless browser — spinner stays forever.
-    // Just verify it appears.
-    await assertSpinnerVisible(button);
-    await expect(button).toBeDisabled();
   });
 });
 

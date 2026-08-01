@@ -14,13 +14,23 @@ export function useUser() {
   });
 }
 
-export function useLogin() {
+export function useMembers() {
+  const { isAuthenticated } = useAuthStore();
+  return useQuery({
+    queryKey: ['members'],
+    queryFn: authApi.members,
+    enabled: !isAuthenticated,
+    staleTime: 60_000,
+  });
+}
+
+export function useMemberLogin() {
   const queryClient = useQueryClient();
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (data: { email: string; password: string }) => authApi.login(data),
+    mutationFn: (data: { memberId: string; password: string }) => authApi.memberLogin(data.memberId, data.password),
     onSuccess: (data) => {
       login(data.user, data.accessToken);
       queryClient.setQueryData(['user'], data.user);
@@ -29,9 +39,10 @@ export function useLogin() {
   });
 }
 
-export function useSignup() {
+export function useCreateMember() {
   return useMutation({
-    mutationFn: (data: { email: string; password: string; displayName: string }) => authApi.signup(data),
+    mutationFn: (data: { displayName: string; password: string; email?: string }) =>
+      authApi.createMember(data),
   });
 }
 
@@ -47,11 +58,5 @@ export function useLogout() {
       queryClient.clear();
       navigate('/login');
     },
-  });
-}
-
-export function useMagicLink() {
-  return useMutation({
-    mutationFn: (email: string) => authApi.magicLink(email),
   });
 }
