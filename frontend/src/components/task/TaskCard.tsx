@@ -39,7 +39,7 @@ export function TaskCard({ task, showZone, zoneName }: TaskCardProps) {
       </div>
       <div className="task-card-content">
         <div className="task-card-title" style={isCompleted ? { textDecoration: 'line-through' } : undefined}>
-          {task.title}
+          <span className="text-dir-auto">{task.title}</span>
         </div>
         <div className="task-card-meta">
           <PriorityDot priority={task.priority} />

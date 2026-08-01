@@ -65,7 +65,7 @@ export function TaskDetailSheet() {
             {zoneName && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
                 <Tag size={16} />
-                <span>{zoneName}</span>
+                <span className="text-dir-auto">{zoneName}</span>
               </div>
             )}
           </div>

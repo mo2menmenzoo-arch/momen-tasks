@@ -30,7 +30,7 @@ export function WhatsNextCard({ task }: WhatsNextCardProps) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBottom: 'var(--space-1)' }}>What's Next</div>
-        <div className="heading-lg truncate">{task.title}</div>
+        <div className="heading-lg truncate"><span className="text-dir-auto">{task.title}</span></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
           <PriorityDot priority={task.priority} />
           <span className="body-xs text-secondary">{formatDueDate(task.dueDate) || 'No due date'}</span>
