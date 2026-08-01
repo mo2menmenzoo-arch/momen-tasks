@@ -13,6 +13,9 @@ import { AppLoggerService } from "../shared/logger/logger.service";
 import { User } from "@prisma/client";
 import { AuthResponse, TokenSet } from "./interfaces/auth-response.interface";
 import { SignupDto } from "./dto/signup.dto";
+import { CreateMemberDto } from "./dto/create-member.dto";
+import { isProduction } from "../config/env.util";
+import { randomUUID } from "node:crypto";
 
 @Injectable()
 export class AuthService {
@@ -90,6 +93,75 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async listMembers() {
+    return this.prisma.user.findMany({
+      where: { deletedAt: null },
+      select: { id: true, displayName: true, avatarUrl: true },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async memberLogin(memberId: string, password: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: memberId },
+    });
+
+    if (!user || !user.passwordHash) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    if (user.authProvider !== "EMAIL") {
+      throw new UnauthorizedException(
+        `This account uses ${user.authProvider} authentication`,
+      );
+    }
+
+    const isValid = await this.passwordService.verify(
+      password,
+      user.passwordHash,
+    );
+
+    if (!isValid) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    return user;
+  }
+
+  async createMember(createMemberDto: CreateMemberDto) {
+    const existingUser = createMemberDto.email
+      ? await this.prisma.user.findUnique({
+          where: { email: createMemberDto.email },
+        })
+      : null;
+
+    if (existingUser) {
+      throw new ConflictException("Email already registered");
+    }
+
+    const hashedPassword = await this.passwordService.hash(
+      createMemberDto.password,
+    );
+    const email =
+      createMemberDto.email || `member-${randomUUID()}@family.local`;
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        passwordHash: hashedPassword,
+        displayName: createMemberDto.displayName,
+        authProvider: "EMAIL",
+        emailVerified: true,
+      },
+    });
+
+    this.logger.log(
+      `Family member created: ${user.id} (${user.email})`,
+      "AuthService",
+    );
+    return this.sanitizeUser(user);
   }
 
   async getUserData(userId: string) {
@@ -441,6 +513,11 @@ export class AuthService {
   ): Promise<void> {
     const resendApiKey = this.configService.get<string>("RESEND_API_KEY");
     if (!resendApiKey) {
+      if (isProduction()) {
+        throw new Error(
+          "RESEND_API_KEY is required in production to send emails. Set it in your hosting provider's environment variables (see docs/vercel-env-setup.md).",
+        );
+      }
       this.logger.warn(
         `RESEND_API_KEY not set. Email not sent to ${to}. Subject: ${subject}`,
         "AuthService",

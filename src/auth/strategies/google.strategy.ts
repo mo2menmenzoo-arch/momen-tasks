@@ -6,12 +6,22 @@ import { ConfigService } from "@nestjs/config";
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
   constructor(configService: ConfigService) {
-    const apiUrl = (
-      configService.get<string>("API_URL") || "http://localhost:3000"
-    ).trimEnd();
+    const apiUrl = configService.get<string>("API_URL");
+    if (!apiUrl) {
+      throw new Error(
+        "API_URL is required to build the Google OAuth callback URL. Set it in your hosting provider's environment variables (see docs/vercel-env-setup.md).",
+      );
+    }
+    const clientId = configService.get<string>("GOOGLE_CLIENT_ID");
+    const clientSecret = configService.get<string>("GOOGLE_CLIENT_SECRET");
+    if (!clientId || !clientSecret) {
+      throw new Error(
+        "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are required for Google OAuth. Set them in your hosting provider's environment variables (see docs/vercel-env-setup.md).",
+      );
+    }
     super({
-      clientID: configService.get<string>("GOOGLE_CLIENT_ID"),
-      clientSecret: configService.get<string>("GOOGLE_CLIENT_SECRET"),
+      clientID: clientId,
+      clientSecret,
       callbackURL: `${apiUrl}/api/v1/auth/google/callback`,
       scope: ["email", "profile"],
     });

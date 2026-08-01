@@ -23,6 +23,8 @@ import { VerifyEmailDto } from "./dto/verify-email.dto";
 import { ForgotPasswordDto, ResetPasswordDto } from "./dto/reset-password.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { GoogleOAuthGuard } from "./guards/google-oauth.guard";
+import { MemberLoginDto } from "./dto/member-login.dto";
+import { CreateMemberDto } from "./dto/create-member.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -54,6 +56,35 @@ export class AuthController {
       user: this.authService.sanitizeUser(user),
       accessToken: tokens.accessToken,
     };
+  }
+
+  @Post("member-login")
+  @HttpCode(HttpStatus.OK)
+  async memberLogin(
+    @Body() memberLoginDto: MemberLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.authService.memberLogin(
+      memberLoginDto.memberId,
+      memberLoginDto.password,
+    );
+    const tokens = await this.tokenService.issueTokens(user.id);
+    this.setTokens(res, tokens.accessToken, tokens.refreshToken);
+    return {
+      user: this.authService.sanitizeUser(user),
+      accessToken: tokens.accessToken,
+    };
+  }
+
+  @Get("members")
+  async members() {
+    return await this.authService.listMembers();
+  }
+
+  @Post("members")
+  @UseGuards(JwtAuthGuard)
+  async createMember(@Body() createMemberDto: CreateMemberDto) {
+    return await this.authService.createMember(createMemberDto);
   }
 
   @Post("logout")
